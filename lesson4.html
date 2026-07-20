@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>4과 · 하나님이 하늘나라를 준비했어요</title>
+<style>
+/* =====================================================================
+   4과: 하나님이 하늘나라를 준비했어요
+   대상: 이민래 학생 (그림·색 선호, 조작 활동 집중, 자기 이름 쓰기 좋아함)
+   기기: 아이패드(애플펜슬/손가락) + 컴퓨터(마우스) 겸용 — Pointer Events
+   흐름: [상황극 1·2: 하늘나라로 보내기] → [어떤 사람이 있을까요?]
+         → [하늘나라 꾸미기(스티커)] → [따라쓰기: 하나님·하늘나라·민래]
+         → [가고 싶어요?] → [갤러리 마무리]
+   1과(따라 그리기 엔진)·3과(선택 활동)와 동일한 디자인 시스템
+   ===================================================================== */
+:root{
+  --paper:#fbf7ef; --card:#fff; --ink:#2b2a26; --soft:#7a7770;
+  --line:#e7e0d3; --ok:#5aa96a; --sun:#f0a92e; --love:#e8668a;
+  --sky:#eaf4fd; --skyline:#cfe4f5;
+  --shadow:0 6px 0 rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;margin:0;}
+@supports(height:100dvh){html,body{height:100dvh;}}
+body{
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Pretendard",sans-serif;
+  background:var(--paper);color:var(--ink);
+  overflow:hidden;overscroll-behavior:none;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;touch-action:manipulation;}
+
+#app{height:100%;display:flex;flex-direction:column;}
+header{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+header .t{font-size:18px;font-weight:800;}
+header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px;}
+#stars{margin-left:auto;font-size:20px;min-height:24px;letter-spacing:2px;}
+
+.screen{flex:1;display:none;flex-direction:column;align-items:center;padding:14px;overflow:hidden;}
+.screen.on{display:flex;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+.say-line{font-size:22px;font-weight:800;text-align:center;margin:2px 0 10px;letter-spacing:-0.5px;}
+.say-line .nm{color:var(--sun);}
+.say-line .lv{color:var(--love);}
+.go-btn{
+  font-size:26px;font-weight:800;padding:20px 54px;border-radius:24px;
+  background:var(--ink);color:#fff;box-shadow:var(--shadow);
+}
+.go-btn:active{transform:translateY(2px);}
+.dots{display:flex;gap:7px;justify-content:center;margin-bottom:8px;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line);}
+.dot.on{background:var(--ink);}
+
+/* ---------- 시작 ---------- */
+#start{justify-content:center;text-align:center;}
+#start .big{font-size:30px;font-weight:800;line-height:1.4;letter-spacing:-0.5px;}
+#start .big .hl{color:var(--sun);}
+#start p{color:var(--soft);font-size:18px;margin:10px 0 26px;}
+
+/* ---------- 상황극 ---------- */
+#drama{padding:10px 14px 14px;}
+#stage{
+  position:relative;flex:1;width:100%;max-width:820px;min-height:260px;
+  border-radius:22px;overflow:hidden;border:3px solid var(--line);box-shadow:var(--shadow);
+  background:linear-gradient(90deg,#f3efe6 0%,#f3efe6 46%,var(--sky) 54%,var(--sky) 100%);
+}
+#zone-heaven{
+  position:absolute;top:0;right:0;bottom:0;width:50%;
+  border-left:3px dashed var(--skyline);
+}
+#zone-heaven .zlabel{
+  position:absolute;top:12px;left:0;right:0;text-align:center;
+  font-size:20px;font-weight:800;color:var(--sun);
+}
+#zone-heaven.glow{animation:glow 1.4s ease infinite;cursor:pointer;}
+@keyframes glow{0%,100%{background:rgba(240,169,46,.0);}50%{background:rgba(240,169,46,.14);}}
+.cloud{position:absolute;background:#fff;border-radius:50px;opacity:.95;}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%;}
+.cloud.c1{width:74px;height:26px;top:46px;left:12%;}
+.cloud.c1::before{width:30px;height:30px;top:-14px;left:12px;}
+.cloud.c1::after{width:22px;height:22px;top:-10px;left:40px;}
+.cloud.c2{width:60px;height:22px;top:100px;right:10%;}
+.cloud.c2::before{width:24px;height:24px;top:-11px;left:10px;}
+.cloud.c2::after{width:18px;height:18px;top:-8px;left:32px;}
+#sunicon{position:absolute;top:14px;right:14px;font-size:34px;}
+#char{
+  position:absolute;left:7%;bottom:6%;width:min(150px,26vw);
+  transition:transform 1.25s ease;will-change:transform;z-index:3;
+}
+#char svg{width:100%;height:auto;display:block;filter:drop-shadow(0 4px 0 rgba(0,0,0,.08));}
+#char.pop{animation:pop .5s ease;}
+@keyframes pop{0%{scale:.6;}70%{scale:1.12;}100%{scale:1;}}
+#drama-say{
+  font-size:18px;font-weight:700;color:var(--soft);text-align:center;
+  margin-top:12px;min-height:26px;
+}
+#tap-hint{
+  position:absolute;bottom:10px;right:8%;font-size:15px;font-weight:800;color:var(--soft);
+  background:#fff;border:2px solid var(--line);border-radius:12px;padding:6px 10px;
+  pointer-events:none;z-index:4;animation:bob 1.2s ease infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* ---------- 어떤 사람이 있을까요? (선택) ---------- */
+#pickp{justify-content:center;}
+#pickp-sub{color:var(--soft);font-size:17px;font-weight:700;margin:0 0 18px;min-height:24px;text-align:center;}
+#pickp-sub.oops{color:var(--love);animation:fade .25s ease;}
+#pickp-row{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;}
+.p-card{
+  background:var(--card);border:3px solid var(--line);border-radius:22px;
+  padding:16px 18px 12px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:transform .12s ease;
+}
+.p-card:active{transform:scale(.94);}
+.p-card svg{width:min(130px,30vw);height:auto;display:block;}
+.p-card .lb{font-size:18px;font-weight:800;color:var(--soft);}
+.p-card.shake{animation:shake .45s ease;}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}20%{transform:translateX(-9px);}40%{transform:translateX(9px);}
+  60%{transform:translateX(-6px);}80%{transform:translateX(6px);}
+}
+
+/* ---------- 하늘나라 꾸미기 ---------- */
+#deco{padding:10px 14px 14px;}
+#heaven{
+  position:relative;flex:1;width:100%;max-width:820px;min-height:230px;
+  border-radius:22px;overflow:hidden;border:3px solid var(--skyline);box-shadow:var(--shadow);
+  background:linear-gradient(180deg,#f6fbff 0%,var(--sky) 100%);
+}
+#heaven .zlabel{position:absolute;top:10px;left:0;right:0;text-align:center;font-size:19px;font-weight:800;color:var(--sun);}
+.placed{position:absolute;width:min(96px,17vw);animation:drop .45s ease;}
+.placed svg{width:100%;height:auto;display:block;}
+@keyframes drop{0%{transform:scale(.3) translateY(-30px);opacity:0;}70%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+#tray{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  padding:12px 4px 2px;width:100%;max-width:820px;align-items:flex-end;
+}
+.stk{
+  background:var(--card);border:3px solid var(--line);border-radius:16px;
+  padding:8px 10px 6px;box-shadow:0 3px 0 rgba(0,0,0,.08);
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.stk:active{transform:scale(.9);}
+.stk svg{width:52px;height:auto;display:block;}
+.stk .lb{font-size:13px;font-weight:800;color:var(--soft);}
+.stk.used{opacity:.35;pointer-events:none;}
+#deco-say{font-size:16px;font-weight:700;color:var(--soft);text-align:center;margin-top:8px;min-height:22px;}
+.done-btn{
+  font-size:19px;font-weight:800;padding:13px 26px;border-radius:16px;
+  background:#e7f4ea;border:3px solid #bfe2c8;color:var(--ok);box-shadow:0 3px 0 rgba(0,0,0,.08);
+}
+.done-btn:active{transform:translateY(2px);}
+
+/* ---------- 따라쓰기 (1과 엔진) ---------- */
+#trace{padding:10px 14px 14px;}
+#board-wrap{
+  position:relative;flex:1;width:100%;max-width:760px;min-height:200px;
+  background:#fff;border:3px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+#paper,#inkc{position:absolute;inset:0;width:100%;height:100%;}
+#inkc{touch-action:none;}
+#toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  padding:12px 4px 2px;width:100%;max-width:760px;
+}
+.sw{
+  width:50px;height:50px;border-radius:16px;border:4px solid #fff;
+  box-shadow:0 3px 0 rgba(0,0,0,.12);flex:0 0 auto;
+}
+.sw:active{transform:scale(.9);}
+.sw.sel{outline:4px solid var(--ink);outline-offset:2px;}
+.tool-btn{
+  font-size:17px;font-weight:800;padding:13px 18px;border-radius:16px;
+  background:var(--card);border:3px solid var(--line);box-shadow:0 3px 0 rgba(0,0,0,.08);
+}
+.tool-btn:active{transform:translateY(2px);}
+
+/* ---------- 가고 싶어요? ---------- */
+#ask{justify-content:center;text-align:center;}
+#ask .big{font-size:28px;font-weight:800;line-height:1.5;letter-spacing:-0.5px;}
+#ask .big .lv{color:var(--love);}
+#ask p{color:var(--soft);font-size:18px;font-weight:700;margin:10px 0 26px;}
+.love-btn{
+  font-size:24px;font-weight:800;padding:20px 44px;border-radius:24px;
+  background:var(--love);color:#fff;box-shadow:var(--shadow);
+  animation:heartbeat 1.6s ease infinite;
+}
+@keyframes heartbeat{0%,100%{transform:scale(1);}12%{transform:scale(1.06);}24%{transform:scale(1);}}
+
+/* ---------- 마무리 갤러리 ---------- */
+#end{overflow-y:auto;justify-content:flex-start;}
+#end h2{font-size:26px;font-weight:800;margin:8px 0 2px;text-align:center;letter-spacing:-0.5px;}
+#end h2 .lv{color:var(--love);}
+#end p{color:var(--soft);font-size:17px;margin:0 0 14px;text-align:center;font-weight:700;}
+.heart-row{font-size:28px;letter-spacing:6px;text-align:center;margin-bottom:8px;}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:640px;}
+@media(max-width:520px){.g-grid{grid-template-columns:repeat(2,1fr);}}
+.g-item{
+  background:#fff;border:3px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow);text-align:center;padding-bottom:8px;
+}
+.g-item img{width:100%;display:block;background:#fff;}
+.g-item .cap{font-size:15px;font-weight:800;margin-top:4px;}
+#end .go-btn{margin:20px 0 8px;font-size:20px;padding:16px 40px;}
+
+/* ---------- 칭찬 오버레이 ---------- */
+#praise{
+  position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.93);flex-direction:column;text-align:center;z-index:50;
+}
+#praise.on{display:flex;animation:fade .25s ease;}
+#praise .big-e{font-size:80px;animation:pop2 .45s ease;}
+@keyframes pop2{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+#praise .msg{font-size:27px;font-weight:800;margin-top:8px;letter-spacing:-0.5px;}
+#praise .sub{font-size:19px;color:var(--soft);margin-top:5px;font-weight:700;}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="t">4과 · 하늘나라<small>하나님이 하늘나라를 준비했어요</small></div>
+    <div id="stars"></div>
+  </header>
+
+  <!-- 시작 -->
+  <section class="screen on" id="start">
+    <div class="big">하나님이 <span class="hl">하늘나라</span>를<br>준비했어요</div>
+    <p>하늘나라가 어떤 곳인지 함께 알아봐요 ☁️</p>
+    <button class="go-btn" id="btn-start">시작하기</button>
+  </section>
+
+  <!-- 1) 상황극 -->
+  <section class="screen" id="drama">
+    <div class="dots" id="drama-dots"></div>
+    <div class="say-line" id="drama-title"></div>
+    <div id="stage">
+      <div id="zone-heaven">
+        <div class="zlabel">☁️ 하늘나라 ☁️</div>
+        <div id="sunicon">🌞</div>
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+      </div>
+      <div id="char"></div>
+      <div id="tap-hint">👆 하늘나라를 눌러요</div>
+    </div>
+    <div id="drama-say"></div>
+  </section>
+
+  <!-- 2) 어떤 사람이 있을까요? -->
+  <section class="screen" id="pickp">
+    <div class="say-line">하늘나라에는 <span class="nm">어떤 사람</span>이 있을까요?</div>
+    <div id="pickp-sub">하늘나라에 어울리는 사람을 눌러 보세요</div>
+    <div id="pickp-row"></div>
+  </section>
+
+  <!-- 3) 하늘나라 꾸미기 -->
+  <section class="screen" id="deco">
+    <div class="say-line"><span class="nm">하늘나라</span>를 꾸며 보세요</div>
+    <div id="heaven">
+      <div class="zlabel">☁️ 하늘나라 · 하나님이 계세요 🌞</div>
+    </div>
+    <div id="deco-say">붙이고 싶은 스티커를 눌러 보세요</div>
+    <div id="tray"></div>
+  </section>
+
+  <!-- 4) 따라쓰기 -->
+  <section class="screen" id="trace">
+    <div class="say-line" id="trace-title"></div>
+    <div class="dots" id="trace-dots"></div>
+    <div id="board-wrap">
+      <canvas id="paper"></canvas>
+      <canvas id="inkc"></canvas>
+    </div>
+    <div id="toolbar">
+      <span id="palette" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"></span>
+      <button class="tool-btn" id="btn-clear">🧽 다시</button>
+      <button class="done-btn" id="btn-done">⭐ 다 썼어요</button>
+    </div>
+  </section>
+
+  <!-- 5) 가고 싶어요? -->
+  <section class="screen" id="ask">
+    <div class="big"><span class="lv">민래</span>도 하늘나라에<br>가고 싶어요?</div>
+    <p>하나님이 민래를 기다리고 계세요</p>
+    <button class="love-btn" id="btn-yes">💛 네! 가고 싶어요</button>
+  </section>
+
+  <!-- 마무리 -->
+  <section class="screen" id="end">
+    <h2>🎉 <span class="lv">민래</span>가 하늘나라를 배웠어요</h2>
+    <div class="heart-row">💛 ☁️ 💛</div>
+    <p>하늘나라는 아픔도 슬픔도 없이, 하나님과 행복한 곳이에요</p>
+    <div class="g-grid" id="g-grid"></div>
+    <button class="go-btn" id="btn-again">한 번 더 하기</button>
+  </section>
+
+  <!-- 칭찬 -->
+  <div id="praise">
+    <div class="big-e" id="pr-emoji">⭐</div>
+    <div class="msg" id="pr-msg"></div>
+    <div class="sub" id="pr-sub"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var STUDENT="민래";
+
+/* ================= 사람 캐릭터 SVG 생성 ================= */
+/* mood: sick(아픔·목발) | sad(눈물) | happy(만세·웃음) | calm(미소)  tag: 이름표 */
+function personSVG(mood,tag,shirt){
+  shirt=shirt||"#7fb2d8";
+  var s='<svg viewBox="0 0 120 168" xmlns="http://www.w3.org/2000/svg">';
+  // 팔 (몸통보다 먼저 그려 뒤로)
+  if(mood==="happy"){
+    s+='<path d="M48 72 L28 48" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+    s+='<path d="M72 72 L92 48" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+  }else{
+    s+='<path d="M48 72 L36 104" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+    s+='<path d="M72 72 L84 104" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+  }
+  // 몸통·다리
+  s+='<rect x="44" y="62" width="32" height="52" rx="12" fill="'+shirt+'" stroke="#2b2a26" stroke-width="3"/>';
+  s+='<path d="M52 114 L52 150" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+  s+='<path d="M68 114 L68 150" stroke="#2b2a26" stroke-width="7" stroke-linecap="round"/>';
+  // 머리
+  s+='<circle cx="60" cy="36" r="24" fill="#ffe3c7" stroke="#2b2a26" stroke-width="3"/>';
+  // 표정
+  if(mood==="happy"||mood==="calm"){
+    s+='<circle cx="51" cy="32" r="2.6" fill="#2b2a26"/><circle cx="69" cy="32" r="2.6" fill="#2b2a26"/>';
+    s+='<path d="M50 42 Q60 52 70 42" fill="none" stroke="#2b2a26" stroke-width="3" stroke-linecap="round"/>';
+  }else{
+    s+='<path d="M46 26 L54 29" stroke="#2b2a26" stroke-width="2.5" stroke-linecap="round"/>';
+    s+='<path d="M74 26 L66 29" stroke="#2b2a26" stroke-width="2.5" stroke-linecap="round"/>';
+    s+='<circle cx="51" cy="33" r="2.6" fill="#2b2a26"/><circle cx="69" cy="33" r="2.6" fill="#2b2a26"/>';
+    s+='<path d="M50 47 Q60 40 70 47" fill="none" stroke="#2b2a26" stroke-width="3" stroke-linecap="round"/>';
+  }
+  if(mood==="sick"){ // 붕대 + 목발
+    s+='<rect x="40" y="14" width="26" height="12" rx="6" fill="#fff" stroke="#c9c2b4" stroke-width="2" transform="rotate(-18 53 20)"/>';
+    s+='<path d="M100 66 L100 150" stroke="#8a6a4a" stroke-width="6" stroke-linecap="round"/>';
+    s+='<path d="M90 68 L110 68" stroke="#8a6a4a" stroke-width="6" stroke-linecap="round"/>';
+  }
+  if(mood==="sad"){ // 눈물
+    s+='<path d="M49 40 q-3 7 0 9 q4 -1 0 -9" fill="#7fb2d8"/>';
+    s+='<path d="M71 40 q3 7 0 9 q-4 -1 0 -9" fill="#7fb2d8"/>';
+  }
+  if(mood==="happy"){ // 하트
+    s+='<text x="16" y="30" font-size="18">💛</text><text x="92" y="24" font-size="16">💛</text>';
+  }
+  if(tag){ // 이름표
+    s+='<rect x="38" y="76" width="44" height="20" rx="5" fill="#fff" stroke="#e8668a" stroke-width="2.5"/>';
+    s+='<text x="60" y="91" text-anchor="middle" font-size="14" font-weight="800" fill="#e8668a" font-family="inherit">'+tag+'</text>';
+  }
+  return s+'</svg>';
+}
+function familySVG(){ // 가족(둘)
+  return '<svg viewBox="0 0 120 168" xmlns="http://www.w3.org/2000/svg">'+
+   '<g transform="translate(-16,10) scale(0.86)">'+personInner("calm","#e8a3b8")+'</g>'+
+   '<g transform="translate(40,0) scale(0.92)">'+personInner("calm","#9dc78f")+'</g></svg>';
+}
+function personInner(mood,shirt){
+  var full=personSVG(mood,null,shirt);
+  return full.replace(/^<svg[^>]*>/,"").replace(/<\/svg>$/,"");
+}
+
+/* ================= 상황극 데이터 ================= */
+var DRAMA=[
+ {title:'<span class="lv">아픈 사람</span>이 있어요', mood:"sick", shirt:"#7fb2d8",
+  say:"몸이 아파요… 어디로 가면 아프지 않을까요?",
+  after:"하늘나라에서는 아프지 않아요!", sub:"걷고 뛸 수 있어요 — 하나님이 계시니까요", em:"🏃"},
+ {title:'<span class="lv">슬픈 사람</span>이 있어요', mood:"sad", shirt:"#b79fd6",
+  say:"너무 슬퍼요… 어디로 가면 눈물이 나지 않을까요?",
+  after:"하늘나라에서는 슬프지 않아요!", sub:"하나님이 사랑해 주세요 — 이제 행복해요", em:"😊"}
+];
+var dIdx=0;
+
+/* ================= 스티커 ================= */
+var STICKERS=[
+ {key:"happy1", lb:"행복한 사람", svg:personSVG("happy",null,"#7fb2d8"), cap:"아팠던 사람이 하늘나라에서 건강해졌어요"},
+ {key:"happy2", lb:"웃는 사람",   svg:personSVG("happy",null,"#b79fd6"), cap:"슬펐던 사람이 하늘나라에서 행복해요"},
+ {key:"family", lb:"가족",        svg:familySVG(),                        cap:"가족도 하늘나라에서 함께 기뻐요"},
+ {key:"tch",    lb:"선생님",      svg:personSVG("calm",null,"#e8b53e"),   cap:"선생님도 하늘나라에 가고 싶어요"},
+ {key:"me",     lb:STUDENT,       svg:personSVG("happy",STUDENT,"#f0a92e"),cap:"하나님이 "+STUDENT+"를 기다리고 계세요"}
+];
+var SLOTS=[[8,38],[34,55],[58,34],[76,58],[40,20]]; // [left%, top%]
+var placedCount=0;
+
+/* ================= 따라쓰기 낱말 ================= */
+var WORDS=[
+ {w:"하나님",   sub:"하늘나라에는 하나님이 계세요"},
+ {w:"하늘나라", sub:"하나님이 준비하신 곳이에요"},
+ {w:STUDENT,   sub:"하나님이 "+STUDENT+"를 기다리세요"}
+];
+var wIdx=0, works=[];
+
+/* ================= 공통 ================= */
+var $=function(id){return document.getElementById(id);};
+var scr={start:$("start"),drama:$("drama"),pickp:$("pickp"),deco:$("deco"),
+         trace:$("trace"),ask:$("ask"),end:$("end")};
+var starCount=0, starsEl=$("stars"), praiseEl=$("praise");
+function show(name){
+  Object.keys(scr).forEach(function(k){scr[k].classList.remove("on");});
+  scr[name].classList.add("on");
+}
+function renderStars(){ starsEl.textContent="⭐".repeat(Math.min(starCount,10)); }
+function praise(emoji,msg,sub,ms,cb){
+  $("pr-emoji").textContent=emoji; $("pr-msg").textContent=msg; $("pr-sub").textContent=sub||"";
+  praiseEl.classList.add("on");
+  setTimeout(function(){ praiseEl.classList.remove("on"); if(cb)cb(); }, ms||1900);
+}
+function dots(el,total,cur){
+  el.innerHTML="";
+  for(var i=0;i<total;i++){
+    var d=document.createElement("div");
+    d.className="dot"+(i<=cur?" on":"");
+    el.appendChild(d);
+  }
+}
+
+/* ================= 1) 상황극 ================= */
+var charEl=$("char"), heavenZone=$("zone-heaven"), dramaSay=$("drama-say");
+var dramaBusy=false;
+function loadDrama(){
+  var d=DRAMA[dIdx];
+  dots($("drama-dots"),DRAMA.length,dIdx);
+  $("drama-title").innerHTML=d.title;
+  dramaSay.textContent=d.say;
+  charEl.style.transition="none";
+  charEl.style.transform="translateX(0)";
+  charEl.innerHTML=personSVG(d.mood,null,d.shirt);
+  charEl.classList.remove("pop");
+  heavenZone.classList.add("glow");
+  $("tap-hint").style.display="block";
+  dramaBusy=false;
+}
+function toHeaven(){
+  if(dramaBusy) return;
+  dramaBusy=true;
+  var d=DRAMA[dIdx];
+  heavenZone.classList.remove("glow");
+  $("tap-hint").style.display="none";
+  // 하늘나라 중앙까지 이동 거리 계산
+  var st=$("stage").getBoundingClientRect(), ch=charEl.getBoundingClientRect();
+  var target=st.left+st.width*0.72-(ch.left+ch.width/2);
+  charEl.style.transition="transform 1.25s ease";
+  requestAnimationFrame(function(){ charEl.style.transform="translateX("+target+"px)"; });
+  dramaSay.textContent="하늘나라로 가고 있어요…";
+  setTimeout(function(){
+    charEl.innerHTML=personSVG("happy",null,d.shirt); // 목발·눈물 사라지고 만세!
+    charEl.classList.add("pop");
+    dramaSay.textContent=d.after;
+    starCount++; renderStars();
+    setTimeout(function(){
+      praise(d.em,d.after,d.sub,2100,function(){
+        dIdx++;
+        if(dIdx<DRAMA.length){ loadDrama(); }
+        else { loadPickP(); show("pickp"); }
+      });
+    },900);
+  },1350);
+}
+heavenZone.addEventListener("click",toHeaven);
+charEl.addEventListener("click",toHeaven);
+
+/* ================= 2) 어떤 사람이 있을까요? ================= */
+var pickLock=false;
+function loadPickP(){
+  var row=$("pickp-row"); row.innerHTML="";
+  $("pickp-sub").classList.remove("oops");
+  $("pickp-sub").textContent="하늘나라에 어울리는 사람을 눌러 보세요";
+  var opts=[
+    {ok:false, lb:"아픈 사람",  svg:personSVG("sick",null,"#7fb2d8"),
+     hint:"하늘나라에서는 아프지 않아요."},
+    {ok:true,  lb:"행복한 사람", svg:personSVG("happy",null,"#7fb2d8")}
+  ];
+  if(Math.random()<0.5) opts.reverse();
+  opts.forEach(function(o){
+    var b=document.createElement("button");
+    b.className="p-card";
+    b.innerHTML=o.svg+'<span class="lb">'+o.lb+'</span>';
+    b.addEventListener("click",function(){
+      if(pickLock) return;
+      if(o.ok){
+        pickLock=true;
+        starCount++; renderStars();
+        praise("😊","맞아요! 행복한 사람이에요","하늘나라에는 아픔도 슬픔도 없어요",2000,function(){
+          pickLock=false;
+          loadDeco(); show("deco");
+        });
+      }else{
+        b.classList.add("shake");
+        $("pickp-sub").classList.add("oops");
+        $("pickp-sub").textContent=o.hint+" 행복한 사람을 찾아보세요!";
+        setTimeout(function(){ b.classList.remove("shake"); },500);
+      }
+    });
+    row.appendChild(b);
+  });
+}
+
+/* ================= 3) 하늘나라 꾸미기 ================= */
+function loadDeco(){
+  placedCount=0;
+  var hv=$("heaven");
+  hv.querySelectorAll(".placed,.hv-cloud").forEach(function(n){n.remove();});
+  // 배경 구름
+  [[10,64,70],[70,70,56],[42,78,64]].forEach(function(c){
+    var cl=document.createElement("div");
+    cl.className="cloud c1 hv-cloud";
+    cl.style.cssText="left:"+c[0]+"%;top:"+c[1]+"%;width:"+c[2]+"px;";
+    hv.appendChild(cl);
+  });
+  $("deco-say").textContent="붙이고 싶은 스티커를 눌러 보세요";
+  var tray=$("tray"); tray.innerHTML="";
+  STICKERS.forEach(function(sk,i){
+    var b=document.createElement("button");
+    b.className="stk";
+    b.innerHTML=sk.svg+'<span class="lb">'+sk.lb+'</span>';
+    b.addEventListener("click",function(){
+      if(b.classList.contains("used")) return;
+      b.classList.add("used");
+      var p=document.createElement("div");
+      p.className="placed";
+      var slot=SLOTS[placedCount%SLOTS.length];
+      p.style.left=slot[0]+"%"; p.style.top=slot[1]+"%";
+      p.innerHTML=sk.svg;
+      hv.appendChild(p);
+      placedCount++;
+      $("deco-say").textContent=sk.cap;
+      if(placedCount===1){ // 첫 스티커 후 완료 버튼 등장
+        var doneB=document.createElement("button");
+        doneB.className="done-btn"; doneB.id="deco-done";
+        doneB.textContent="⭐ 다 꾸몄어요";
+        doneB.addEventListener("click",function(){
+          starCount++; renderStars();
+          praise("☁️","하늘나라를 예쁘게 꾸몄어요","모두 하나님과 함께 행복해요",2000,function(){
+            wIdx=0; works=[]; show("trace");
+            requestAnimationFrame(function(){ traceResize(); loadWord(); });
+          });
+        });
+        tray.appendChild(doneB);
+      }
+    });
+    tray.appendChild(b);
+  });
+}
+
+/* ================= 4) 따라쓰기 — 1과 따라 그리기 엔진 재사용 ================= */
+var paper=$("paper"), inkc=$("inkc");
+var pctx=paper.getContext("2d"), ictx=inkc.getContext("2d");
+var wrap=$("board-wrap");
+var strokes=[], curStroke=null;
+var COLORS=["#2b2a26","#e0433c","#f0a92e","#f4d03f","#5aa96a","#4a95d8","#8e6fc0","#e8668a"];
+var color=COLORS[2];
+var W=0,H=0,DPR=1;
+
+function traceResize(){
+  var r=wrap.getBoundingClientRect();
+  DPR=window.devicePixelRatio||1;
+  W=Math.max(1,Math.round(r.width)); H=Math.max(1,Math.round(r.height));
+  [paper,inkc].forEach(function(cv){ cv.width=W*DPR; cv.height=H*DPR; });
+  pctx.setTransform(DPR,0,0,DPR,0,0); ictx.setTransform(DPR,0,0,DPR,0,0);
+  redrawAll();
+}
+function drawTemplate(){
+  pctx.clearRect(0,0,W,H);
+  var word=WORDS[wIdx].w;
+  var fs=Math.min(H*0.52, (W*0.86)/word.length);
+  pctx.font="800 "+fs+"px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  pctx.textAlign="center"; pctx.textBaseline="middle";
+  // 연한 채움 + 점선 외곽선 = 따라쓰기 밑글자
+  pctx.fillStyle="#f2ede1";
+  pctx.fillText(word,W/2,H/2);
+  pctx.strokeStyle="#b9b2a3";
+  pctx.lineWidth=Math.max(2,fs*0.02);
+  pctx.setLineDash([fs*0.06,fs*0.05]);
+  pctx.strokeText(word,W/2,H/2);
+  pctx.setLineDash([]);
+}
+function brushW(p){
+  var base=Math.min(W,H)*0.03;
+  return Math.max(5, base*(0.6+(p||0.5)*0.9));
+}
+function redrawInk(){
+  ictx.clearRect(0,0,W,H);
+  ictx.lineCap="round"; ictx.lineJoin="round";
+  strokes.forEach(function(st){
+    ictx.strokeStyle=st.color;
+    for(var i=1;i<st.pts.length;i++){
+      var a=st.pts[i-1],b=st.pts[i];
+      ictx.lineWidth=brushW(b.p);
+      ictx.beginPath();ictx.moveTo(a.x*W,a.y*H);ictx.lineTo(b.x*W,b.y*H);ictx.stroke();
+    }
+    if(st.pts.length===1){
+      var pt=st.pts[0];
+      ictx.fillStyle=st.color;
+      ictx.beginPath();ictx.arc(pt.x*W,pt.y*H,brushW(pt.p)/2,0,Math.PI*2);ictx.fill();
+    }
+  });
+}
+function redrawAll(){ drawTemplate(); redrawInk(); }
+
+var drawing=false, activeId=null, lastPenTime=0;
+function posOf(e){
+  var r=inkc.getBoundingClientRect();
+  return {x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height,
+          p:(e.pointerType==="pen"&&e.pressure)?e.pressure:0.5};
+}
+inkc.addEventListener("pointerdown",function(e){
+  e.preventDefault();
+  if(e.pointerType==="pen") lastPenTime=Date.now();
+  if(e.pointerType==="touch" && Date.now()-lastPenTime<1500) return; // 팜 리젝션
+  if(drawing) return;
+  drawing=true; activeId=e.pointerId;
+  inkc.setPointerCapture(e.pointerId);
+  curStroke={color:color, pts:[posOf(e)]};
+  strokes.push(curStroke);
+  redrawInk();
+});
+inkc.addEventListener("pointermove",function(e){
+  if(!drawing||e.pointerId!==activeId) return;
+  e.preventDefault();
+  if(e.pointerType==="pen") lastPenTime=Date.now();
+  var evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+  evs.forEach(function(ev){ curStroke.pts.push(posOf(ev)); });
+  var n=curStroke.pts.length;
+  ictx.strokeStyle=curStroke.color; ictx.lineCap="round"; ictx.lineJoin="round";
+  for(var i=Math.max(1,n-evs.length);i<n;i++){
+    var a=curStroke.pts[i-1],b=curStroke.pts[i];
+    ictx.lineWidth=brushW(b.p);
+    ictx.beginPath();ictx.moveTo(a.x*W,a.y*H);ictx.lineTo(b.x*W,b.y*H);ictx.stroke();
+  }
+});
+function endStroke(e){
+  if(!drawing||e.pointerId!==activeId) return;
+  drawing=false; activeId=null; curStroke=null;
+  redrawInk();
+}
+inkc.addEventListener("pointerup",endStroke);
+inkc.addEventListener("pointercancel",endStroke);
+
+var pal=$("palette");
+COLORS.forEach(function(cl,i){
+  var b=document.createElement("button");
+  b.className="sw"+(cl===color?" sel":"");
+  b.style.background=cl; b.setAttribute("aria-label","색 "+(i+1));
+  b.addEventListener("click",function(){
+    color=cl;
+    pal.querySelectorAll(".sw").forEach(function(x){x.classList.remove("sel");});
+    b.classList.add("sel");
+  });
+  pal.appendChild(b);
+});
+$("btn-clear").addEventListener("click",function(){ strokes=[]; redrawInk(); });
+$("btn-done").addEventListener("click",function(){
+  // 판정 없음 — 스스로 누르면 완성. 작품 저장
+  var out=document.createElement("canvas");
+  out.width=W; out.height=H;
+  var octx=out.getContext("2d");
+  octx.fillStyle="#ffffff"; octx.fillRect(0,0,W,H);
+  octx.drawImage(paper,0,0,W,H);
+  octx.drawImage(inkc,0,0,W,H);
+  var wd=WORDS[wIdx];
+  try{ works.push({name:wd.w,url:out.toDataURL("image/png")}); }
+  catch(e){ works.push({name:wd.w,url:null}); }
+  starCount++; renderStars();
+  praise("⭐",wd.w+"! 참 잘 썼어요",wd.sub,1900,function(){
+    wIdx++;
+    if(wIdx<WORDS.length){ loadWord(); }
+    else { show("ask"); }
+  });
+});
+function loadWord(){
+  strokes=[];
+  var wd=WORDS[wIdx];
+  $("trace-title").innerHTML='<span class="nm">'+wd.w+'</span> 을(를) 따라 써요';
+  dots($("trace-dots"),WORDS.length,wIdx);
+  redrawAll();
+}
+window.addEventListener("resize",function(){
+  if(scr.trace.classList.contains("on")) traceResize();
+});
+
+/* ================= 5) 가고 싶어요? → 마무리 ================= */
+$("btn-yes").addEventListener("click",function(){
+  starCount++; renderStars();
+  praise("🥰","하나님이 "+STUDENT+"를 기다리고 계세요","하늘나라에서 하나님과 함께 행복해요",2300,function(){
+    openEnd();
+  });
+});
+function openEnd(){
+  var g=$("g-grid"); g.innerHTML="";
+  works.forEach(function(wk){
+    var it=document.createElement("div"); it.className="g-item";
+    it.innerHTML=(wk.url?'<img src="'+wk.url+'" alt="'+wk.name+'">':'<div style="font-size:52px;padding:20px">✏️</div>')+
+      '<div class="cap">✏️ '+wk.name+'</div>';
+    g.appendChild(it);
+  });
+  show("end");
+}
+
+/* ================= 시작/다시 ================= */
+function restart(){
+  dIdx=0; wIdx=0; works=[]; starCount=0; renderStars();
+  show("drama"); loadDrama();
+}
+$("btn-start").addEventListener("click",restart);
+$("btn-again").addEventListener("click",restart);
+renderStars();
+})();
+</script>
+</body>
+</html>

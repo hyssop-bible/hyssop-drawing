@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>2과 · 하나님은 사람을 사랑하세요 — 하트 붙이기</title>
+<script>
+/* =====================================================================
+   ★★★ 이미지 넣는 곳 (여기만 만지면 됩니다) ★★★
+
+   1) 사진 파일을 이 html 파일과 "같은 폴더"에 넣으세요.
+   2) 아래 image 자리에 파일 이름을 적으세요. 예) image:"아기.jpg"
+   3) 파일이 폴더에 없어도 괜찮습니다 — 자동으로 이모지가 대신 나옵니다.
+      (즉, 파일명을 미리 적어두고 나중에 사진만 폴더에 넣으면 바로 적용됨)
+
+   - name  : 화면 문장에 그대로 들어갑니다 → "하나님이 ○○을 사랑하세요"
+   - emoji : 사진이 없을 때 대신 보여줄 그림(대체 자원)
+   - me    : true면 민래님 본인 카드(노란 테두리). 마지막에 두면 절정.
+   - 카드 순서 = 나오는 순서. 줄을 복사해 사람을 늘리거나 지워도 됩니다.
+   ===================================================================== */
+var PEOPLE=[
+  { name:"아기",      emoji:"👶", image:"아기.jpg" },
+  { name:"아이",      emoji:"🧒", image:"아이.jpg" },
+  { name:"어른",      emoji:"🧑", image:"어른.jpg" },
+  { name:"할머니",    emoji:"👵", image:"할머니.jpg" },
+  { name:"민래님",    emoji:"🙂", image:"민래.jpg", me:true }
+];
+</script>
+<style>
+/* =====================================================================
+   2과: 하나님은 사람을 사랑하세요 — 하트 끌어 붙이기 (v3)
+   v3 변경: 이미지 드롭인 구조(없으면 이모지 자동 대체) + 이미지 대형화
+   대상: 이민래 학생 / 기기: 아이패드(손가락·펜슬) + 컴퓨터(마우스)
+   ===================================================================== */
+:root{
+  --paper:#fbf7ef; --card:#fff; --ink:#2b2a26; --soft:#7a7770;
+  --line:#e7e0d3; --rose:#e15579; --ok:#5aa96a;
+  --shadow:0 6px 0 rgba(0,0,0,.08);
+  /* 이미지/이모지 크기: 화면에 비례해 커짐 (작은폰 170px ~ 아이패드 300px) */
+  --face-img:clamp(170px, 42vmin, 300px);
+  --face-emo:clamp(120px, 30vmin, 210px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;margin:0;}
+@supports(height:100dvh){html,body{height:100dvh;}}
+body{
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Pretendard",sans-serif;
+  background:var(--paper);color:var(--ink);
+  overflow:hidden;overscroll-behavior:none;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;touch-action:manipulation;}
+
+#app{height:100%;display:flex;flex-direction:column;}
+header{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+header .t{font-size:18px;font-weight:800;}
+header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px;}
+#stars{margin-left:auto;font-size:20px;min-height:24px;letter-spacing:2px;}
+
+.screen{flex:1;display:none;flex-direction:column;align-items:center;padding:14px;overflow:hidden;}
+.screen.on{display:flex;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ---------- 시작 ---------- */
+#start{justify-content:center;text-align:center;}
+#start .big{font-size:30px;font-weight:800;line-height:1.4;letter-spacing:-.5px;}
+#start .big .hl{color:var(--rose);}
+#start p{color:var(--soft);font-size:18px;margin:10px 0 26px;}
+.go-btn{
+  font-size:26px;font-weight:800;padding:20px 54px;border-radius:24px;
+  background:var(--ink);color:#fff;box-shadow:var(--shadow);
+}
+.go-btn:active{transform:translateY(2px);}
+
+/* ---------- 활동 ---------- */
+#play{padding:8px 14px 12px;}
+.say-line{font-size:23px;font-weight:800;text-align:center;margin:4px 0 6px;letter-spacing:-.5px;min-height:34px;}
+.say-line .nm{color:var(--rose);}
+.dots{display:flex;gap:8px;justify-content:center;margin-bottom:8px;}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--line);}
+.dot.on{background:var(--rose);}
+
+#field{
+  position:relative;flex:1;width:100%;max-width:760px;min-height:200px;
+  touch-action:none;
+  display:flex;align-items:flex-start;justify-content:center;
+}
+/* 한 페이지 한 사람: 이미지 대형 */
+.person{
+  position:relative;background:var(--card);border:4px solid var(--line);
+  border-radius:30px;box-shadow:var(--shadow);text-align:center;
+  padding:22px 26px 18px;margin-top:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  transition:transform .12s, border-color .2s;
+  animation:slidein .35s ease;
+  max-width:min(92vw, 480px);
+}
+@keyframes slidein{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:none;}}
+.person .face-emo{font-size:var(--face-emo);line-height:1.05;}
+.person img.face-img{
+  width:var(--face-img);height:var(--face-img);
+  border-radius:26px;object-fit:cover;display:block;
+  background:#f4f1ea;
+}
+.person .nm{font-size:26px;font-weight:800;}
+.person.hot{border-color:var(--rose);transform:scale(1.04);}
+.person.loved{border-color:#f3c1d0;background:#fff5f8;}
+.person .badge{
+  position:absolute;top:-22px;right:-16px;font-size:58px;display:none;
+  filter:drop-shadow(0 2px 1px rgba(0,0,0,.15));
+}
+.person.loved .badge{display:block;animation:pop .35s ease;}
+@keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.25);}100%{transform:scale(1);}}
+.person.me{border-color:#f0c040;}
+.person.me.loved{border-color:#f3c1d0;}
+
+/* 하나님의 사랑 (하트가 나오는 곳) */
+#tray{
+  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  min-width:180px;height:116px;border-radius:26px;background:var(--card);
+  border:3px dashed #f3c1d0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;padding:0 20px;z-index:2;
+}
+#tray .lbl{font-size:18px;font-weight:800;color:var(--rose);}
+#heart{
+  position:absolute;font-size:72px;cursor:grab;touch-action:none;z-index:9;
+  filter:drop-shadow(0 4px 3px rgba(0,0,0,.18));
+  transition:left .35s cubic-bezier(.3,1.3,.6,1), top .35s cubic-bezier(.3,1.3,.6,1);
+  will-change:left,top;
+}
+#heart.dragging{transition:none;cursor:grabbing;transform:scale(1.15);}
+
+/* ---------- 완료 ---------- */
+#doneScr{justify-content:center;text-align:center;}
+#doneScr .party{font-size:78px;animation:pop .5s ease;}
+#doneScr h2{font-size:28px;font-weight:800;margin:10px 0 4px;}
+#doneScr p{font-size:20px;color:var(--soft);font-weight:700;margin:2px;}
+#doneScr .verse{
+  margin-top:14px;background:var(--card);border:3px solid var(--line);border-radius:20px;
+  padding:16px 22px;box-shadow:var(--shadow);
+}
+#doneScr .verse .v{font-size:22px;font-weight:800;}
+#doneScr .verse .r{font-size:14px;color:var(--soft);font-weight:700;margin-top:6px;}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="t">2과 · 하트 붙이기<small>하나님은 사람을 사랑하세요</small></div>
+    <div id="stars"></div>
+  </header>
+
+  <!-- 시작 -->
+  <section class="screen on" id="start">
+    <div class="big">하나님은 <span class="hl">모두</span> 사랑하세요</div>
+    <p>❤️ 하트를 끌어서 붙여 보세요</p>
+    <button class="go-btn" id="btn-start">시작하기</button>
+  </section>
+
+  <!-- 활동: 한 페이지에 한 사람 -->
+  <section class="screen" id="play">
+    <div class="say-line" id="say-line">❤️ 하트를 끌어서 붙여 보세요</div>
+    <div class="dots" id="dots"></div>
+    <div id="field">
+      <div id="card-slot"></div>
+      <div id="tray"><div style="font-size:32px">💝</div><div class="lbl">하나님의 사랑</div></div>
+      <div id="heart">❤️</div>
+    </div>
+  </section>
+
+  <!-- 완료 -->
+  <section class="screen" id="doneScr">
+    <div class="party">🎉</div>
+    <h2>민래님이 다 붙였어요!</h2>
+    <p>하나님은 <b>모두</b> 사랑하세요</p>
+    <div class="verse">
+      <div class="v">하나님은 사랑이시라</div>
+      <div class="r">요한일서 4:16</div>
+    </div>
+    <button class="go-btn" id="btn-again" style="margin-top:24px;font-size:20px;padding:16px 40px;">또 하기</button>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- 요소/상태 ---------------- */
+var $=function(id){return document.getElementById(id);};
+var startScr=$("start"), playScr=$("play"), doneScr=$("doneScr");
+var slot=$("card-slot"), field=$("field"), tray=$("tray"), heart=$("heart");
+var sayLine=$("say-line"), dotsEl=$("dots"), starsEl=$("stars");
+var idx=0, stars=0, curCard=null, advancing=false;
+
+function renderStars(){ starsEl.textContent="⭐".repeat(Math.min(stars,8)); }
+function show(scr){ [startScr,playScr,doneScr].forEach(function(s){s.classList.remove("on");}); scr.classList.add("on"); }
+function speak(name){ sayLine.innerHTML='하나님이 <span class="nm">'+name+'</span>을 사랑하세요'; }
+
+/* ---------------- 진행 점 ---------------- */
+function buildDots(){
+  dotsEl.innerHTML="";
+  PEOPLE.forEach(function(_,i){
+    var d=document.createElement("div");
+    d.className="dot"+(i<=idx?" on":"");
+    dotsEl.appendChild(d);
+  });
+}
+
+/* ---------------- 얼굴 요소: 사진 있으면 사진, 없으면 이모지 자동 대체 ----------------
+   image 파일이 폴더에 없거나 이름이 틀려도 오류 없이 emoji로 스스로 바뀝니다.
+   → 파일명을 미리 적어두고, 사진은 나중에 폴더에 넣기만 하면 됨 */
+function makeFace(p){
+  var emo=document.createElement("div");
+  emo.className="face-emo"; emo.textContent=p.emoji||"🙂";
+  if(!p.image) return emo;
+  var img=document.createElement("img");
+  img.className="face-img"; img.alt=p.name; img.draggable=false;
+  img.addEventListener("error",function(){ img.replaceWith(emo); }); // 자동 대체
+  img.src=p.image;
+  return img;
+}
+
+/* ---------------- 한 사람 카드 표시 ---------------- */
+function loadPerson(){
+  advancing=false;
+  var p=PEOPLE[idx];
+  slot.innerHTML="";
+  var c=document.createElement("div");
+  c.className="person"+(p.me?" me":"");
+  c.appendChild(makeFace(p));
+  var nm=document.createElement("div"); nm.className="nm"; nm.textContent=p.name;
+  var badge=document.createElement("div"); badge.className="badge"; badge.textContent="❤️";
+  c.appendChild(nm); c.appendChild(badge);
+  c.dataset.name=p.name;
+  c.addEventListener("click",function(){
+    if(c.classList.contains("loved")) speak(p.name); // 반복 학습
+  });
+  slot.appendChild(c);
+  curCard=c;
+  buildDots();
+  sayLine.innerHTML='❤️ 하트를 <span class="nm">'+p.name+'</span>에게 주세요';
+}
+
+/* ---------------- 하트 위치 ---------------- */
+function heartHome(){
+  var fr=field.getBoundingClientRect(), tr=tray.getBoundingClientRect();
+  heart.style.left=(tr.left-fr.left+tr.width/2-36)+"px";
+  heart.style.top =(tr.top -fr.top +tr.height/2-46)+"px";
+}
+
+/* ---------------- 드래그 (Pointer Events: 손가락/펜/마우스) ---------------- */
+var dragging=false, offX=0, offY=0;
+heart.addEventListener("pointerdown",function(e){
+  e.preventDefault();
+  if(advancing) return;
+  dragging=true;
+  heart.classList.add("dragging");
+  heart.setPointerCapture(e.pointerId);
+  var hr=heart.getBoundingClientRect();
+  offX=e.clientX-hr.left; offY=e.clientY-hr.top;
+});
+heart.addEventListener("pointermove",function(e){
+  if(!dragging) return;
+  e.preventDefault();
+  var fr=field.getBoundingClientRect();
+  heart.style.left=(e.clientX-fr.left-offX)+"px";
+  heart.style.top =(e.clientY-fr.top -offY)+"px";
+  if(curCard && !curCard.classList.contains("loved")){
+    curCard.classList.toggle("hot", isOverCard(e.clientX,e.clientY));
+  }
+});
+heart.addEventListener("pointerup",function(e){
+  if(!dragging) return;
+  dragging=false;
+  heart.classList.remove("dragging");
+  if(curCard) curCard.classList.remove("hot");
+  if(curCard && !curCard.classList.contains("loved") && isOverCard(e.clientX,e.clientY)){
+    attach();
+  } else {
+    heartHome(); // 빗나가도 지적 없음 — '하나님의 사랑'으로 돌아감
+  }
+});
+heart.addEventListener("pointercancel",function(){
+  dragging=false; heart.classList.remove("dragging"); heartHome();
+});
+function isOverCard(x,y){
+  if(!curCard) return false;
+  var r=curCard.getBoundingClientRect();
+  return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+}
+
+/* ---------------- 붙이기 → 다음 사람 ---------------- */
+function attach(){
+  advancing=true;
+  curCard.classList.add("loved");
+  stars++; renderStars();
+  speak(curCard.dataset.name);
+  heart.style.opacity="0";
+  setTimeout(function(){ heartHome(); heart.style.opacity="1"; },250);
+  setTimeout(function(){
+    idx++;
+    if(idx>=PEOPLE.length){ show(doneScr); }
+    else { loadPerson(); }
+  },1800);
+}
+
+/* ---------------- 시작/다시 ---------------- */
+function begin(){
+  idx=0; stars=0; renderStars();
+  loadPerson();
+  show(playScr);
+  requestAnimationFrame(heartHome);
+}
+$("btn-start").addEventListener("click",begin);
+$("btn-again").addEventListener("click",begin);
+window.addEventListener("resize",function(){
+  if(playScr.classList.contains("on") && !dragging) heartHome();
+});
+renderStars();
+})();
+</script>
+</body>
+</html>

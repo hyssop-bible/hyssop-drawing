@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>1과 · 하나님이 모두 만드셨어요 — 따라 그리기</title>
+<style>
+/* =====================================================================
+   1과: 하나님이 모든 것을 만드셨어요 — 따라 그리기 프로그램
+   대상: 이민래 학생 (그림·색 선호, 판정 없음, 자기 완성작 갤러리)
+   기기: 아이패드(애플펜슬/손가락) + 컴퓨터(마우스) 겸용 — Pointer Events
+   ===================================================================== */
+:root{
+  --paper:#fbf7ef; --card:#fff; --ink:#2b2a26; --soft:#7a7770;
+  --line:#e7e0d3; --ok:#5aa96a; --sun:#f0a92e;
+  --shadow:0 6px 0 rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;margin:0;}
+@supports(height:100dvh){html,body{height:100dvh;}}
+body{
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Pretendard",sans-serif;
+  background:var(--paper);color:var(--ink);
+  overflow:hidden;overscroll-behavior:none;
+  -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;
+}
+button{font-family:inherit;border:none;background:none;color:inherit;cursor:pointer;touch-action:manipulation;}
+
+#app{height:100%;display:flex;flex-direction:column;}
+header{
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  background:var(--card);border-bottom:1px solid var(--line);
+}
+header .t{font-size:18px;font-weight:800;}
+header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px;}
+#stars{margin-left:auto;font-size:20px;min-height:24px;letter-spacing:2px;}
+
+.screen{flex:1;display:none;flex-direction:column;align-items:center;padding:14px;overflow:hidden;}
+.screen.on{display:flex;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+/* ---------- 시작 화면 ---------- */
+#start{justify-content:center;text-align:center;}
+#start .big{font-size:30px;font-weight:800;line-height:1.4;letter-spacing:-0.5px;}
+#start .big .hl{color:var(--sun);}
+#start p{color:var(--soft);font-size:18px;margin:10px 0 26px;}
+.go-btn{
+  font-size:26px;font-weight:800;padding:20px 54px;border-radius:24px;
+  background:var(--ink);color:#fff;box-shadow:var(--shadow);
+}
+.go-btn:active{transform:translateY(2px);}
+
+/* ---------- 그리기 화면 ---------- */
+#draw{padding:10px 14px 14px;}
+.say-line{font-size:22px;font-weight:800;text-align:center;margin:2px 0 8px;letter-spacing:-0.5px;}
+.say-line .nm{color:var(--sun);}
+.dots{display:flex;gap:7px;justify-content:center;margin-bottom:8px;}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line);}
+.dot.on{background:var(--ink);}
+
+#board-wrap{
+  position:relative;flex:1;width:100%;max-width:760px;min-height:220px;
+  background:#fff;border:3px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+#paper,#inkc{position:absolute;inset:0;width:100%;height:100%;}
+#inkc{touch-action:none;} /* 그리는 캔버스: 스크롤/줌 완전 차단 */
+
+/* 색 팔레트 + 버튼 */
+#toolbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  padding:12px 4px 2px;width:100%;max-width:760px;
+}
+.sw{
+  width:52px;height:52px;border-radius:16px;border:4px solid #fff;
+  box-shadow:0 3px 0 rgba(0,0,0,.12);flex:0 0 auto;
+}
+.sw:active{transform:scale(.9);}
+.sw.sel{outline:4px solid var(--ink);outline-offset:2px;}
+.tool-btn{
+  font-size:17px;font-weight:800;padding:13px 18px;border-radius:16px;
+  background:var(--card);border:3px solid var(--line);box-shadow:0 3px 0 rgba(0,0,0,.08);
+}
+.tool-btn:active{transform:translateY(2px);}
+.done-btn{background:#e7f4ea;border-color:#bfe2c8;color:var(--ok);font-size:19px;padding:13px 26px;}
+
+/* 칭찬 오버레이 */
+#praise{
+  position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.92);flex-direction:column;text-align:center;z-index:5;
+  border-radius:19px;
+}
+#praise.on{display:flex;animation:fade .25s ease;}
+#praise .big-e{font-size:76px;animation:pop .45s ease;}
+@keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+#praise .msg{font-size:26px;font-weight:800;margin-top:8px;}
+#praise .sub{font-size:19px;color:var(--soft);margin-top:4px;font-weight:700;}
+
+/* ---------- 갤러리(완료) ---------- */
+#gallery{overflow-y:auto;justify-content:flex-start;}
+#gallery h2{font-size:26px;font-weight:800;margin:8px 0 2px;text-align:center;}
+#gallery p{color:var(--soft);font-size:17px;margin:0 0 16px;text-align:center;font-weight:700;}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:640px;}
+@media(max-width:520px){.g-grid{grid-template-columns:repeat(2,1fr);}}
+.g-item{
+  background:#fff;border:3px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow);text-align:center;padding-bottom:8px;
+}
+.g-item img{width:100%;display:block;background:#fff;}
+.g-item .cap{font-size:15px;font-weight:800;margin-top:4px;}
+#gallery .go-btn{margin:22px 0 8px;font-size:20px;padding:16px 40px;}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="t">1과 · 따라 그리기<small>하나님이 모두 만드셨어요</small></div>
+    <div id="stars"></div>
+  </header>
+
+  <!-- 시작 -->
+  <section class="screen on" id="start">
+    <div class="big">하나님이 <span class="hl">모두</span> 만드셨어요</div>
+    <p>점선을 따라 그려 보세요 ✏️</p>
+    <button class="go-btn" id="btn-start">시작하기</button>
+  </section>
+
+  <!-- 그리기 -->
+  <section class="screen" id="draw">
+    <div class="say-line" id="say-line"></div>
+    <div class="dots" id="dots"></div>
+    <div id="board-wrap">
+      <canvas id="paper"></canvas>
+      <canvas id="inkc"></canvas>
+      <div id="praise">
+        <div class="big-e" id="pr-emoji">⭐</div>
+        <div class="msg" id="pr-msg"></div>
+        <div class="sub" id="pr-sub"></div>
+      </div>
+    </div>
+    <div id="toolbar">
+      <span id="palette" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;"></span>
+      <button class="tool-btn" id="btn-clear">🧽 다시</button>
+      <button class="tool-btn done-btn" id="btn-done">⭐ 다 그렸어요</button>
+    </div>
+  </section>
+
+  <!-- 갤러리 -->
+  <section class="screen" id="gallery">
+    <h2>🎉 민래님이 그렸어요!</h2>
+    <p>이 모든 것은 하나님이 만드셨어요</p>
+    <div class="g-grid" id="g-grid"></div>
+    <button class="go-btn" id="btn-again">또 그리기</button>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+var STUDENT="민래";
+
+/* ---------------- 창조물 밑그림 (캔버스 그리기 함수) ----------------
+   각 함수는 (ctx, w, h)를 받아 회색 점선 밑그림을 그림.
+   좌표는 화면 크기에 비례(scale s = min(w,h)) — 어떤 크기에서도 동일 비율 */
+function dash(ctx,s){ ctx.setLineDash([s*0.03, s*0.028]); ctx.lineWidth=Math.max(3,s*0.012);
+  ctx.strokeStyle="#b9b2a3"; ctx.lineCap="round"; }
+
+var SHAPES=[
+ {name:"해", emoji:"☀️", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2;dash(c,s);
+   c.beginPath();c.arc(cx,cy,s*0.20,0,Math.PI*2);c.stroke();
+   for(var i=0;i<8;i++){var a=i*Math.PI/4;
+     c.beginPath();c.moveTo(cx+Math.cos(a)*s*0.27,cy+Math.sin(a)*s*0.27);
+     c.lineTo(cx+Math.cos(a)*s*0.38,cy+Math.sin(a)*s*0.38);c.stroke();}}},
+ {name:"나무", emoji:"🌳", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2;dash(c,s);
+   // 기둥
+   c.beginPath();c.moveTo(cx-s*0.05,cy+s*0.36);c.lineTo(cx-s*0.05,cy+s*0.05);
+   c.moveTo(cx+s*0.05,cy+s*0.36);c.lineTo(cx+s*0.05,cy+s*0.05);c.stroke();
+   // 수관(구름 모양 원 3개)
+   c.beginPath();c.arc(cx,cy-s*0.16,s*0.20,0,Math.PI*2);c.stroke();
+   c.beginPath();c.arc(cx-s*0.17,cy-s*0.02,s*0.14,0,Math.PI*2);c.stroke();
+   c.beginPath();c.arc(cx+s*0.17,cy-s*0.02,s*0.14,0,Math.PI*2);c.stroke();}},
+ {name:"꽃", emoji:"🌸", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2-s*0.05;dash(c,s);
+   c.beginPath();c.arc(cx,cy,s*0.085,0,Math.PI*2);c.stroke(); // 중심
+   for(var i=0;i<6;i++){var a=i*Math.PI/3;
+     c.beginPath();c.arc(cx+Math.cos(a)*s*0.17,cy+Math.sin(a)*s*0.17,s*0.085,0,Math.PI*2);c.stroke();}
+   c.beginPath();c.moveTo(cx,cy+s*0.10);c.lineTo(cx,cy+s*0.40);c.stroke(); // 줄기
+   c.beginPath();c.arc(cx+s*0.07,cy+s*0.28,s*0.06,Math.PI*0.9,Math.PI*1.9);c.stroke();}},
+ {name:"나비", emoji:"🦋", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2;dash(c,s);
+   c.beginPath();c.ellipse(cx,cy,s*0.035,s*0.16,0,0,Math.PI*2);c.stroke(); // 몸
+   c.beginPath();c.ellipse(cx-s*0.15,cy-s*0.10,s*0.13,s*0.11,-0.4,0,Math.PI*2);c.stroke();
+   c.beginPath();c.ellipse(cx+s*0.15,cy-s*0.10,s*0.13,s*0.11,0.4,0,Math.PI*2);c.stroke();
+   c.beginPath();c.ellipse(cx-s*0.13,cy+s*0.10,s*0.10,s*0.09,0.4,0,Math.PI*2);c.stroke();
+   c.beginPath();c.ellipse(cx+s*0.13,cy+s*0.10,s*0.10,s*0.09,-0.4,0,Math.PI*2);c.stroke();
+   c.beginPath();c.moveTo(cx-s*0.02,cy-s*0.16);c.lineTo(cx-s*0.07,cy-s*0.24);c.stroke();
+   c.beginPath();c.moveTo(cx+s*0.02,cy-s*0.16);c.lineTo(cx+s*0.07,cy-s*0.24);c.stroke();}},
+ {name:"물고기", emoji:"🐟", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2;dash(c,s);
+   c.beginPath();c.ellipse(cx-s*0.03,cy,s*0.24,s*0.14,0,0,Math.PI*2);c.stroke(); // 몸
+   c.beginPath();c.moveTo(cx+s*0.20,cy);c.lineTo(cx+s*0.34,cy-s*0.12); // 꼬리
+   c.lineTo(cx+s*0.34,cy+s*0.12);c.closePath();c.stroke();
+   c.beginPath();c.arc(cx-s*0.15,cy-s*0.03,s*0.022,0,Math.PI*2);c.stroke(); // 눈
+   c.beginPath();c.arc(cx-s*0.02,cy,s*0.09,Math.PI*0.25,Math.PI*0.75);c.stroke();}},
+ {name:"별", emoji:"⭐", draw:function(c,w,h){var s=Math.min(w,h),cx=w/2,cy=h/2;dash(c,s);
+   var R=s*0.30,r=s*0.13;c.beginPath();
+   for(var i=0;i<10;i++){var a=-Math.PI/2+i*Math.PI/5;var rr=(i%2===0)?R:r;
+     var x=cx+Math.cos(a)*rr,y=cy+Math.sin(a)*rr;
+     if(i===0)c.moveTo(x,y);else c.lineTo(x,y);}
+   c.closePath();c.stroke();}}
+];
+
+/* ---------------- 상태 ---------------- */
+var idx=0, starCount=0, works=[]; // works: {name, emoji, dataURL}
+var strokes=[]; // 현재 그림의 획: {color, pts:[{x,y,p}]} — x,y는 0~1 정규화
+var curStroke=null;
+var COLORS=["#2b2a26","#e0433c","#f0a92e","#f4d03f","#5aa96a","#4a95d8","#8e6fc0","#e8668a"];
+var color=COLORS[1];
+
+/* ---------------- 요소 ---------------- */
+var $=function(id){return document.getElementById(id);};
+var startScr=$("start"), drawScr=$("draw"), galScr=$("gallery");
+var paper=$("paper"), inkc=$("inkc");
+var pctx=paper.getContext("2d"), ictx=inkc.getContext("2d");
+var wrap=$("board-wrap");
+var sayLine=$("say-line"), dotsEl=$("dots"), starsEl=$("stars");
+var praiseEl=$("praise");
+
+function renderStars(){ starsEl.textContent="⭐".repeat(Math.min(starCount,8)); }
+function show(scr){ [startScr,drawScr,galScr].forEach(function(s){s.classList.remove("on");}); scr.classList.add("on"); }
+
+/* ---------------- 캔버스 크기/그리기 ---------------- */
+var W=0,H=0,DPR=1;
+function resize(){
+  var r=wrap.getBoundingClientRect();
+  DPR=window.devicePixelRatio||1;
+  W=Math.max(1,Math.round(r.width)); H=Math.max(1,Math.round(r.height));
+  [paper,inkc].forEach(function(cv){ cv.width=W*DPR; cv.height=H*DPR; });
+  pctx.setTransform(DPR,0,0,DPR,0,0); ictx.setTransform(DPR,0,0,DPR,0,0);
+  redrawAll();
+}
+function redrawTemplate(){
+  pctx.clearRect(0,0,W,H);
+  SHAPES[idx].draw(pctx,W,H);
+}
+function brushW(p){ // 필압(펜) 반영: 0.5 기본
+  var base=Math.min(W,H)*0.022;
+  return Math.max(4, base*(0.6+ (p||0.5)*0.9));
+}
+function redrawInk(){
+  ictx.clearRect(0,0,W,H);
+  ictx.lineCap="round"; ictx.lineJoin="round";
+  strokes.forEach(function(st){
+    ictx.strokeStyle=st.color;
+    for(var i=1;i<st.pts.length;i++){
+      var a=st.pts[i-1],b=st.pts[i];
+      ictx.lineWidth=brushW(b.p);
+      ictx.beginPath();
+      ictx.moveTo(a.x*W,a.y*H); ictx.lineTo(b.x*W,b.y*H); ictx.stroke();
+    }
+    if(st.pts.length===1){ // 점 하나(콕 찍기)
+      var pt=st.pts[0];
+      ictx.fillStyle=st.color;
+      ictx.beginPath();ictx.arc(pt.x*W,pt.y*H,brushW(pt.p)/2,0,Math.PI*2);ictx.fill();
+    }
+  });
+}
+function redrawAll(){ redrawTemplate(); redrawInk(); }
+
+/* ---------------- 입력: 애플펜슬/손가락/마우스 ----------------
+   - Pointer Events 하나로 펜(pen)·터치(touch)·마우스(mouse) 모두 처리
+   - 팜 리젝션: 펜을 최근에 썼으면(1.5초) 손바닥 터치를 무시.
+     (펜이 없는 학생은 손가락으로도 그릴 수 있게 유지) */
+var drawing=false, activeId=null, lastPenTime=0;
+function posOf(e){
+  var r=inkc.getBoundingClientRect();
+  return {x:(e.clientX-r.left)/r.width, y:(e.clientY-r.top)/r.height,
+          p:(e.pointerType==="pen"&&e.pressure)?e.pressure:0.5};
+}
+inkc.addEventListener("pointerdown",function(e){
+  e.preventDefault();
+  if(e.pointerType==="pen") lastPenTime=Date.now();
+  if(e.pointerType==="touch" && Date.now()-lastPenTime<1500) return; // 팜 리젝션
+  if(drawing) return;
+  drawing=true; activeId=e.pointerId;
+  inkc.setPointerCapture(e.pointerId);
+  curStroke={color:color, pts:[posOf(e)]};
+  strokes.push(curStroke);
+  redrawInk();
+});
+inkc.addEventListener("pointermove",function(e){
+  if(!drawing||e.pointerId!==activeId) return;
+  e.preventDefault();
+  if(e.pointerType==="pen") lastPenTime=Date.now();
+  // 펜슬 고주파 입력 대응(getCoalescedEvents 지원 시 더 부드럽게)
+  var evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
+  evs.forEach(function(ev){ curStroke.pts.push(posOf(ev)); });
+  // 증분 렌더(마지막 부분만)
+  var n=curStroke.pts.length;
+  ictx.strokeStyle=curStroke.color; ictx.lineCap="round"; ictx.lineJoin="round";
+  for(var i=Math.max(1,n-evs.length);i<n;i++){
+    var a=curStroke.pts[i-1],b=curStroke.pts[i];
+    ictx.lineWidth=brushW(b.p);
+    ictx.beginPath();ictx.moveTo(a.x*W,a.y*H);ictx.lineTo(b.x*W,b.y*H);ictx.stroke();
+  }
+});
+function endStroke(e){
+  if(!drawing||e.pointerId!==activeId) return;
+  drawing=false; activeId=null; curStroke=null;
+  redrawInk();
+}
+inkc.addEventListener("pointerup",endStroke);
+inkc.addEventListener("pointercancel",endStroke);
+
+/* ---------------- 팔레트/버튼 ---------------- */
+var pal=$("palette");
+COLORS.forEach(function(cl,i){
+  var b=document.createElement("button");
+  b.className="sw"+(cl===color?" sel":"");
+  b.style.background=cl; b.setAttribute("aria-label","색 "+(i+1));
+  b.addEventListener("click",function(){
+    color=cl;
+    pal.querySelectorAll(".sw").forEach(function(x){x.classList.remove("sel");});
+    b.classList.add("sel");
+  });
+  pal.appendChild(b);
+});
+$("btn-clear").addEventListener("click",function(){
+  strokes=[]; redrawInk();
+});
+$("btn-done").addEventListener("click",function(){
+  // 판정 없음 — 스스로 누르면 완성. 작품 저장(밑그림+그림 합성)
+  var out=document.createElement("canvas");
+  out.width=W; out.height=H;
+  var octx=out.getContext("2d");
+  octx.fillStyle="#ffffff"; octx.fillRect(0,0,W,H);
+  octx.drawImage(paper,0,0,W,H);
+  octx.drawImage(inkc,0,0,W,H);
+  var sh=SHAPES[idx];
+  try{ works.push({name:sh.name,emoji:sh.emoji,url:out.toDataURL("image/png")}); }
+  catch(e){ works.push({name:sh.name,emoji:sh.emoji,url:null}); }
+  starCount++; renderStars();
+  showPraise(sh);
+});
+function showPraise(sh){
+  $("pr-emoji").textContent=sh.emoji;
+  $("pr-msg").textContent=sh.name+"! 참 잘 그렸어요";
+  $("pr-sub").textContent=sh.name+"는 하나님이 만드셨어요";
+  praiseEl.classList.add("on");
+  setTimeout(function(){
+    praiseEl.classList.remove("on");
+    idx++;
+    if(idx>=SHAPES.length){ openGallery(); }
+    else { loadShape(); }
+  },1900);
+}
+
+/* ---------------- 진행/화면 ---------------- */
+function buildDots(){
+  dotsEl.innerHTML="";
+  SHAPES.forEach(function(_,i){
+    var d=document.createElement("div");
+    d.className="dot"+(i<=idx?" on":"");
+    dotsEl.appendChild(d);
+  });
+}
+function loadShape(){
+  strokes=[]; buildDots();
+  var sh=SHAPES[idx];
+  sayLine.innerHTML='<span class="nm">'+sh.name+'</span>를 따라 그려요 — '+sh.name+'는 하나님이 만드셨어요';
+  redrawAll();
+}
+function openGallery(){
+  var g=$("g-grid"); g.innerHTML="";
+  works.forEach(function(wk){
+    var it=document.createElement("div"); it.className="g-item";
+    it.innerHTML=(wk.url?'<img src="'+wk.url+'" alt="'+wk.name+'">':'<div style="font-size:60px;padding:20px">'+wk.emoji+'</div>')+
+      '<div class="cap">'+wk.emoji+' '+wk.name+'</div>';
+    g.appendChild(it);
+  });
+  show(galScr);
+}
+$("btn-start").addEventListener("click",function(){
+  idx=0; works=[]; show(drawScr);
+  requestAnimationFrame(function(){ resize(); loadShape(); });
+});
+$("btn-again").addEventListener("click",function(){
+  idx=0; works=[]; starCount=0; renderStars();
+  show(drawScr);
+  requestAnimationFrame(function(){ resize(); loadShape(); });
+});
+
+window.addEventListener("resize",function(){ if(drawScr.classList.contains("on")) resize(); });
+renderStars();
+})();
+</script>
+</body>
+</html>

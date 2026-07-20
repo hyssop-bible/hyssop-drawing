@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>죄 활동 프로그램</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --surface-0:#faf9f5;
+  --surface-1:#f5f4ee;
+  --border:rgba(0,0,0,0.14);
+  --border-strong:rgba(0,0,0,0.28);
+  --border-accent:#b5d4f4;
+  --bg-accent:#e6f1fb;
+  --text-primary:#1a1a17;
+  --text-secondary:#5f5e5a;
+  --text-accent:#185fa5;
+  --radius:8px;
+  --heaven-bg:#e6f1fb;
+  --heaven-label:#185fa5;
+  --god-bg:#faeeda;
+  --god-border:#ba7517;
+  --god-text:#633806;
+  --blood:#a41f1f;          /* [수정] 예수님의 피 색상 토큰 */
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --surface-0:#1f1e1b;
+    --surface-1:#2a2925;
+    --border:rgba(255,255,255,0.16);
+    --border-strong:rgba(255,255,255,0.32);
+    --border-accent:#185fa5;
+    --bg-accent:#0c447c;
+    --text-primary:#f1efe8;
+    --text-secondary:#b4b2a9;
+    --text-accent:#85b7eb;
+    --heaven-bg:rgba(55,138,221,0.16);
+    --heaven-label:#85b7eb;
+    --god-bg:#633806;
+    --god-border:#fac775;
+    --god-text:#faeeda;
+    --blood:#e06a63;        /* [수정] 다크모드용 피 색상 */
+  }
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  background:var(--surface-0);
+  color:var(--text-primary);
+}
+.wrap{
+  max-width:1500px;margin:0 auto;padding:16px 20px 20px;
+  height:100%;display:flex;flex-direction:column;
+}
+.topbar{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px;
+}
+h1{font-size:22px;font-weight:600;margin:0;margin-right:auto;}
+/* [수정] 차시 표시 배지 (교사 확인용) */
+.lesson-badge{
+  font-size:13px;color:var(--text-secondary);
+  border:1px solid var(--border);border-radius:999px;padding:3px 10px;
+}
+button{
+  font:inherit;font-size:15px;color:var(--text-primary);
+  background:transparent;border:1px solid var(--border-strong);
+  border-radius:var(--radius);padding:9px 16px;cursor:pointer;
+}
+button:hover{background:var(--surface-1);}
+button:active{transform:scale(0.98);}
+button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
+/* [수정] 6과 전용 '예수님의 피' 버튼 스타일 */
+.blood-btn{
+  border-color:var(--blood);color:var(--blood);font-weight:600;
+}
+.blood-btn:hover{background:rgba(164,31,31,0.08);}
+#add-form{
+  display:none;gap:6px;align-items:center;
+}
+#add-form.open{display:flex;}
+#sin-input{
+  font:inherit;font-size:15px;color:var(--text-primary);
+  background:var(--surface-1);border:1px solid var(--border-strong);
+  border-radius:var(--radius);padding:9px 12px;width:180px;outline:none;
+}
+#sin-input:focus{border-color:var(--text-accent);}
+#status{font-size:17px;color:var(--text-secondary);margin:0 0 10px;min-height:24px;}
+#arena{
+  position:relative;flex:1;min-height:460px;
+  border:1px solid var(--border);
+  border-radius:12px;background:var(--surface-1);overflow:hidden;touch-action:none;
+}
+#heaven{
+  position:absolute;top:0;right:0;bottom:0;
+  background:var(--heaven-bg);border-left:3px dashed #378add;
+}
+.heaven-label{
+  position:absolute;top:16px;left:0;right:0;text-align:center;
+  font-size:19px;font-weight:600;color:var(--heaven-label);
+  user-select:none;pointer-events:none;
+}
+.heaven-label img{width:26px;height:26px;vertical-align:-6px;margin-right:6px;}
+/* 하나님은 교안 원칙에 따라 텍스트로만 표현합니다 (이미지·이모지 없음) */
+#god{
+  position:absolute;left:0;top:0;width:112px;height:112px;border-radius:50%;
+  background:var(--god-bg);border:2.5px solid var(--god-border);color:var(--god-text);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:600;cursor:grab;
+  touch-action:none;user-select:none;will-change:transform;
+}
+#me{
+  position:absolute;left:0;top:0;width:92px;height:92px;border-radius:50%;
+  background:var(--bg-accent);color:var(--text-accent);border:1.5px solid var(--border-accent);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-weight:600;font-size:17px;cursor:grab;
+  touch-action:none;user-select:none;will-change:transform;
+}
+#me .face{font-size:32px;line-height:1;}
+#me img.face{width:42px;height:42px;border-radius:50%;object-fit:cover;}
+#sinblob{
+  position:absolute;left:0;top:0;border-radius:50%;
+  background:#2c2c2a;color:#f1efe8;border:1.5px solid var(--border-strong);
+  display:none;align-items:center;justify-content:center;
+  cursor:grab;touch-action:none;user-select:none;will-change:transform;
+}
+.blob-inner{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;pointer-events:none;
+}
+.blob-title{font-size:21px;font-weight:700;}
+#sinlist{font-size:13px;opacity:0.85;text-align:center;line-height:1.35;padding:0 10px;}
+@keyframes shake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+.shaking{animation:shake 0.25s 2;}
+.sin-chip{
+  position:absolute;left:0;top:0;width:68px;height:68px;border-radius:50%;
+  background:#2c2c2a;color:#f1efe8;border:1.5px solid var(--border-strong);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;
+  pointer-events:none;user-select:none;will-change:transform;
+}
+.sin-chip .face{font-size:21px;line-height:1.1;}
+.sin-chip img.face{width:26px;height:26px;border-radius:50%;object-fit:cover;}
+/* [수정] 예수님의 피(빨간 하트)가 죄 덩어리 위로 내려오는 연출 */
+.blood-heart{
+  position:absolute;left:0;top:0;font-size:38px;line-height:1;
+  color:var(--blood);pointer-events:none;user-select:none;z-index:6;
+  will-change:transform,opacity;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>죄 활동 프로그램</h1>
+    <span class="lesson-badge" id="lesson-badge"></span>
+    <div id="add-form">
+      <input id="sin-input" type="text" placeholder="예: 나쁜 말" maxlength="10">
+      <button id="btn-add-confirm">추가</button>
+    </div>
+    <button id="btn-add"><i class="ti ti-plus" aria-hidden="true"></i>죄 추가</button>
+    <!-- [수정] 기존 '죄 떼어내기' 버튼:
+         5과에서는 숨김 (수업 결론이 '내 힘으로는 없앨 수 없다'에서 멈추도록),
+         6과에서는 '예수님의 피' 버튼으로 재정의됩니다. -->
+    <button id="btn-blood" style="display:none;"></button>
+    <button id="btn-reset"><i class="ti ti-refresh" aria-hidden="true"></i>처음부터</button>
+  </div>
+  <div id="status">'나'를 클릭해 보세요. 나에게 무엇이 있을까요?</div>
+
+  <div id="arena">
+    <div id="heaven">
+      <div class="heaven-label" id="heaven-label"></div>
+    </div>
+    <div id="god">하나님</div>
+    <div id="me"></div>
+    <div id="sinblob">
+      <div class="blob-inner" id="blob-inner">
+        <div class="blob-title">죄</div>
+        <div id="sinlist"></div>
+      </div>
+    </div>
+    <!-- 죄 칩은 CONFIG.sins를 바탕으로 스크립트가 자동 생성합니다 -->
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ================================================================
+     [수정] LESSON — 차시 스위치 (교사가 수업 전에 설정)
+     - 5 : 5과 모드. 죄를 없애는 수단이 화면에 없습니다.
+           수업의 결론이 "내 힘으로는 죄를 없앨 수 없어요"에서 멈추어
+           6과("하나님이 방법을 준비하셨어요")로 이어지는 클리프행어를 지킵니다.
+     - 6 : 6과 모드. '예수님의 피' 버튼이 나타납니다.
+           죄 제거의 유일한 주체가 예수님의 피임을 시각화합니다.
+           (드래그로 떼는 것은 6과에서도 여전히 불가능합니다 — 롬 7장)
+  ================================================================ */
+  var LESSON = 5;
+
+  /* ================================================================
+     CONFIG — UI(그림/이모지) 붙이는 곳
+     - emoji: 이모지 한 글자를 넣으면 그대로 표시됩니다.
+     - image: 그림 파일 경로를 넣으면 이모지 대신 그림이 표시됩니다.
+              예) image: 'me.png'  (html 파일과 같은 폴더에 두세요)
+     - situation: '나'를 클릭했을 때 상태창에 나오는 상황 설명입니다.
+     ※ 하나님은 교안 원칙(텍스트로만 표현)에 따라 CONFIG에 넣지 않습니다.
+  ================================================================ */
+  var CONFIG = {
+    me:     { label: '나',      emoji: '🙂', image: null },
+    heaven: { label: '하늘나라', emoji: '☁️', image: null },
+    sins: [
+      { label: '거짓말', emoji: '🤥', image: null,
+        situation: "장난감을 망가뜨리고 '내가 안 그랬어'라고 말했어요" },
+      { label: '화냄',   emoji: '😡', image: null,
+        situation: '친구에게 버럭 화를 냈어요' },
+      { label: '미움',   emoji: '💢', image: null,
+        situation: '친구를 미워하는 마음이 생겼어요' }
+    ]
+  };
+
+  var CHIP=68, CHIP_H=CHIP/2;   // 죄 칩 크기
+
+  var arena=document.getElementById('arena');
+  var heavenEl=document.getElementById('heaven');
+  var heavenLabelEl=document.getElementById('heaven-label');
+  var godEl=document.getElementById('god');
+  var meEl=document.getElementById('me');
+  var blobEl=document.getElementById('sinblob');
+  var blobInnerEl=document.getElementById('blob-inner');
+  var sinlistEl=document.getElementById('sinlist');
+  var statusEl=document.getElementById('status');
+  var addFormEl=document.getElementById('add-form');
+  var sinInputEl=document.getElementById('sin-input');
+  var bloodBtn=document.getElementById('btn-blood');       /* [수정] */
+  var lessonBadgeEl=document.getElementById('lesson-badge');/* [수정] */
+
+  var SNAP_DIST=130;
+  var CLICK_DIST=6;
+  var MAX_SINS=8;
+
+  var god={x:0,y:0,w:112,h:112};
+  var me={x:0,y:0,w:92,h:92};
+  var blob={x:0,y:0,w:0,h:0,free:false,returning:false};
+  var sins=[];
+  var absorbed=[];
+  var meWithGod=false;
+  var drag=null;
+  var lastMsg='';
+  var flashTimer=null;
+  var popping=false;
+  var cleansing=false;          /* [수정] 피 연출 중 중복 클릭 방지 */
+  var cleansedByJesus=false;    /* [수정] 예수님의 피로 죄가 없어졌는지 */
+
+  /* ---------- UI(스킨) 적용 ---------- */
+  function faceHTML(cfg){
+    if(cfg.image) return '<img class="face" src="'+cfg.image+'" alt="">';
+    if(cfg.emoji) return '<div class="face">'+cfg.emoji+'</div>';
+    return '';
+  }
+  function applySkins(){
+    meEl.innerHTML=faceHTML(CONFIG.me)+'<div>'+CONFIG.me.label+'</div>';
+    heavenLabelEl.innerHTML=(CONFIG.heaven.image
+      ? '<img src="'+CONFIG.heaven.image+'" alt="">'
+      : (CONFIG.heaven.emoji||''))+' '+CONFIG.heaven.label;
+    // godEl은 텍스트 '하나님' 그대로 둡니다 (교안 원칙)
+  }
+
+  /* [수정] 차시별 버튼/배지 세팅 */
+  function applyLesson(){
+    if(LESSON===6){
+      lessonBadgeEl.textContent='6과 · 예수님이 죄를 없애주셨어요';
+      bloodBtn.style.display='';
+      bloodBtn.className='blood-btn';
+      bloodBtn.innerHTML='<i class="ti ti-heart-filled" aria-hidden="true"></i>예수님의 피';
+    } else {
+      lessonBadgeEl.textContent='5과 · 죄';
+      bloodBtn.style.display='none';
+    }
+  }
+
+  function makeSinChip(cfg){
+    var el=document.createElement('div');
+    el.className='sin-chip';
+    el.innerHTML=faceHTML(cfg)+'<div>'+cfg.label+'</div>';
+    el.style.display='none';
+    arena.appendChild(el);
+    var s={el:el,cfg:cfg,revealed:false};
+    sins.push(s);
+    return s;
+  }
+
+  /* ---------- 공통 유틸 ---------- */
+  function heavenX(){ return arena.clientWidth-Math.min(500,Math.round(arena.clientWidth*0.50)); }
+  function setStatus(t){ if(t!==lastMsg){ lastMsg=t; statusEl.textContent=t; } }
+  function center(o){ return {x:o.x+o.w/2,y:o.y+o.h/2}; }
+  function dist(a,b){ var dx=a.x-b.x,dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy); }
+  function hasSin(){ return absorbed.length>0; }
+  function blobSize(n){ return 66+(n!==undefined?n:absorbed.length)*20; }
+  function blobAnchor(size){
+    var s=size||blobSize();
+    return {x:me.x-s+34, y:me.y-s+34};
+  }
+
+  function updateBlob(){
+    if(!absorbed.length){ blobEl.style.display='none'; return; }
+    var s=blobSize();
+    blob.w=s; blob.h=s;
+    blobEl.style.display='flex';
+    blobEl.style.width=s+'px';
+    blobEl.style.height=s+'px';
+    sinlistEl.textContent=absorbed.join(' \u00b7 ');
+  }
+
+  function flashBoundary(){
+    heavenEl.style.borderLeftColor='#e24b4a';
+    if(flashTimer) clearTimeout(flashTimer);
+    flashTimer=setTimeout(function(){ heavenEl.style.borderLeftColor='#378add'; },350);
+  }
+  function clampArena(o){
+    var W=arena.clientWidth,H=arena.clientHeight;
+    o.x=Math.max(8,Math.min(W-o.w-8,o.x));
+    o.y=Math.max(8,Math.min(H-o.h-8,o.y));
+  }
+  function clampOutsideHeaven(o,margin){
+    var hx=heavenX()-(margin||4);
+    if(o.x+o.w>hx){ o.x=hx-o.w; return true; }
+    return false;
+  }
+  function clampInsideHeaven(o){
+    var W=arena.clientWidth,hx=heavenX();
+    o.x=Math.max(hx+8,Math.min(W-o.w-8,o.x));
+  }
+
+  /* ---------- 죄가 '나' 안에서 나와 덩어리로 합쳐지기 ---------- */
+  function revealNextSin(){
+    if(popping||cleansing) return;
+    var next=null;
+    for(var i=0;i<sins.length;i++){ if(!sins[i].revealed){ next=sins[i]; break; } }
+    if(!next){
+      setStatus('죄가 있는 상태로 하늘나라에 갈 수 있을까요?');
+      return;
+    }
+    revealSin(next);
+  }
+
+  function revealSin(s){
+    popping=true;
+    s.revealed=true;
+    var el=s.el;
+    var startX=me.x+me.w/2-CHIP_H, startY=me.y+me.h/2-CHIP_H;
+    // 잠깐 보여줄 위치: '나'의 왼쪽 위 (하늘나라 반대 방향)
+    var showX=Math.max(12,me.x-115), showY=Math.max(12,me.y-55);
+    el.style.display='flex';
+    el.style.transition='none';
+    el.style.opacity='0';
+    el.style.transform='translate('+startX+'px,'+startY+'px) scale(0.2)';
+    void el.offsetWidth;
+    el.style.transition='transform 0.35s, opacity 0.35s';
+    el.style.opacity='1';
+    el.style.transform='translate('+showX+'px,'+showY+'px) scale(1)';
+    setStatus(s.cfg.situation+" → '"+s.cfg.label+"' 죄가 나에게 있어요");
+
+    // 잠깐 보여준 뒤 '죄' 덩어리 속으로
+    setTimeout(function(){
+      var nextSize=blobSize(absorbed.length+1);
+      var a=blobAnchor(nextSize);
+      var tx=a.x+nextSize/2-CHIP_H, ty=a.y+nextSize/2-CHIP_H;
+      el.style.transition='transform 0.4s, opacity 0.4s';
+      el.style.transform='translate('+tx+'px,'+ty+'px) scale(0.15)';
+      el.style.opacity='0';
+      setTimeout(function(){
+        el.style.display='none';
+        el.style.transition='none';
+        el.style.opacity='1';
+        absorbed.push(s.cfg.label);
+        cleansedByJesus=false;   /* [수정] 새 죄가 드러나면 상태 갱신 */
+        updateBlob();
+        popping=false;
+        if(meWithGod||me.x+me.w>heavenX()-4){
+          meWithGod=false;
+          pushMeOut();
+          setStatus('죄가 있어서, 하늘나라에 있을 수 없게 됐어요');
+        }
+      },410);
+    },900);
+  }
+
+  /* ---------- 죄 덩어리가 다시 붙는 연출 ---------- */
+  function blobShake(){
+    blobInnerEl.classList.remove('shaking');
+    void blobInnerEl.offsetWidth;
+    blobInnerEl.classList.add('shaking');
+    setStatus('떼려고 해도 떨어지지 않아요…');
+  }
+  /* [수정] 내 손으로 떼는 것은 5과·6과 모두 불가능합니다.
+     죄 제거의 유일한 통로는 6과의 '예수님의 피' 버튼입니다. (롬 7:18, 엡 1:7) */
+  function blobReturn(){
+    blob.returning=true;
+    var a=blobAnchor();
+    blobEl.style.transition='transform 0.6s cubic-bezier(0.34,1.4,0.64,1)';
+    blob.x=a.x; blob.y=a.y;
+    blobEl.style.transform='translate('+a.x+'px,'+a.y+'px)';
+    setStatus(LESSON===6
+      ? '내 힘으로는 없앨 수 없어요. 누가 없애주실 수 있을까요?'   /* [수정] 6과 유도 질문 */
+      : '내 힘으로는 죄를 없앨 수 없어요');
+    setTimeout(function(){
+      blobEl.style.transition='none';
+      blob.free=false; blob.returning=false;
+    },610);
+  }
+
+  /* ---------- [수정] 6과: 예수님의 피로 죄가 없어지는 연출 ---------- */
+  function cleanseByBlood(){
+    if(cleansing) return;
+    if(!hasSin()){ setStatus("아직 죄가 없어요. '나'를 클릭해 보세요"); return; }
+    cleansing=true;
+    setStatus('예수님이 십자가에서 흘리신 피예요');
+
+    // 1) 빨간 하트가 화면 위에서 죄 덩어리 위로 내려옴
+    var heart=document.createElement('div');
+    heart.className='blood-heart';
+    heart.textContent='\u2764';
+    var hx=blob.x+blob.w/2-19;
+    heart.style.transform='translate('+hx+'px,-50px)';
+    heart.style.opacity='1';
+    arena.appendChild(heart);
+    void heart.offsetWidth;
+    heart.style.transition='transform 0.8s ease-in';
+    heart.style.transform='translate('+hx+'px,'+(blob.y+blob.h/2-19)+'px)';
+
+    setTimeout(function(){
+      // 2) 죄 덩어리가 피로 붉게 물듦 (검정 → 빨강)
+      heart.style.transition='opacity 0.4s';
+      heart.style.opacity='0';
+      blobEl.style.transition='background 0.6s, border-color 0.6s';
+      blobEl.style.background='var(--blood)';
+      blobEl.style.borderColor='var(--blood)';
+      setStatus('예수님의 피가 죄를 덮었어요');
+
+      setTimeout(function(){
+        // 3) 붉게 물든 죄가 사라짐
+        blobEl.style.transition='transform 0.5s, opacity 0.5s, background 0.6s, border-color 0.6s';
+        blobEl.style.opacity='0';
+
+        setTimeout(function(){
+          heart.remove();
+          absorbed=[];
+          sins.forEach(function(s){ s.revealed=true; });  /* [수정] 드러난 죄는 모두 없어진 것으로 */
+          updateBlob();
+          blobEl.style.opacity='1';
+          blobEl.style.transition='none';
+          blobEl.style.background='#2c2c2a';              /* 다음 사용 대비 원래 색 복원 */
+          blobEl.style.borderColor='var(--border-strong)';
+          blob.free=false;
+          cleansing=false;
+          cleansedByJesus=true;
+          /* [수정] 존재 소멸 언어("죄가 사라졌어요") 대신
+             죄책 제거·관계 회복 언어로 교체 (엡 1:7, 요일 3:5) */
+          setStatus('예수님의 피가 죄를 다 없애주셨어요. 이제 하나님께 가까이 가 보세요');
+        },520);
+      },700);
+    },820);
+  }
+
+  /* ---------- 배치/렌더 ---------- */
+  function layout(){
+    var W=arena.clientWidth,hx=heavenX();
+    heavenEl.style.width=(W-hx)+'px';
+    god.x=hx+(W-hx)/2-god.w/2; god.y=Math.max(90,arena.clientHeight*0.24);
+    me.x=W*0.22; me.y=arena.clientHeight/2-me.h/2+30;
+    sins.forEach(function(s){ s.revealed=false; s.el.style.display='none'; });
+    absorbed=[];
+    blob.free=false; blob.returning=false;
+    cleansing=false; cleansedByJesus=false;   /* [수정] */
+    blobEl.style.background='#2c2c2a';
+    blobEl.style.borderColor='var(--border-strong)';
+    updateBlob();
+    meWithGod=false;
+    popping=false;
+    setStatus("'나'를 클릭해 보세요. 내 안에 무엇이 있을까요?");
+  }
+
+  function render(){
+    godEl.style.transform='translate('+god.x+'px,'+god.y+'px)';
+    meEl.style.transform='translate('+me.x+'px,'+me.y+'px)';
+    if(hasSin() && !blob.free && !blob.returning){
+      var a=blobAnchor();
+      blob.x=a.x; blob.y=a.y;
+      blobEl.style.transform='translate('+a.x+'px,'+a.y+'px)';
+    } else if(blob.free && !blob.returning){
+      blobEl.style.transform='translate('+blob.x+'px,'+blob.y+'px)';
+    }
+  }
+
+  function pushMeOut(){
+    var hx=heavenX();
+    meEl.style.transition='transform 0.4s';
+    me.x=hx-me.w-80;
+    setTimeout(function(){ meEl.style.transition='none'; },420);
+    flashBoundary();
+  }
+
+  function tick(){
+    if(meWithGod){
+      me.x=god.x+god.w/2-me.w/2;
+      me.y=god.y+god.h+10;
+      clampArena(me);
+    } else if(hasSin() && (!drag||drag.type!=='me')){
+      if(clampOutsideHeaven(me,4)) flashBoundary();
+    }
+    render();
+    requestAnimationFrame(tick);
+  }
+
+  /* ---------- 드래그/클릭 ---------- */
+  function startDrag(e,type,obj,el){
+    e.preventDefault();
+    var r=arena.getBoundingClientRect();
+    drag={type:type,obj:obj,
+      dx:e.clientX-r.left-obj.x, dy:e.clientY-r.top-obj.y,
+      startX:e.clientX, startY:e.clientY, moved:0};
+    el.setPointerCapture(e.pointerId);
+    el.style.cursor='grabbing';
+  }
+
+  function moveDrag(e){
+    if(!drag) return;
+    drag.moved=Math.max(drag.moved,
+      Math.abs(e.clientX-drag.startX)+Math.abs(e.clientY-drag.startY));
+    if(drag.moved<=CLICK_DIST) return;
+    if(drag.type==='me'&&meWithGod){ meWithGod=false; }
+    if(drag.type==='blob'){ blob.free=true; }
+    var r=arena.getBoundingClientRect();
+    var o=drag.obj;
+    o.x=e.clientX-r.left-drag.dx;
+    o.y=e.clientY-r.top-drag.dy;
+    clampArena(o);
+    if(drag.type==='god'){ clampInsideHeaven(o); return; }
+    if(drag.type==='blob'){
+      if(clampOutsideHeaven(o,4)){
+        flashBoundary();
+        setStatus('죄는 하늘나라에 들어갈 수 없어요');
+      }
+      return;
+    }
+    if(drag.type==='me'){
+      if(hasSin()){
+        if(clampOutsideHeaven(o,4)){
+          flashBoundary();
+          setStatus('죄가 있으면 하늘나라에 들어갈 수 없어요');
+        }
+      } else {
+        var hx=heavenX();
+        if(o.x+o.w>hx){
+          if(dist(center(god),center(o))<SNAP_DIST) setStatus('하나님 가까이에서 놓아 보세요');
+          else setStatus('하늘나라에 들어왔어요. 하나님께 가까이 가 보세요');
+        }
+      }
+    }
+  }
+
+  function endDrag(e,el){
+    if(!drag) return;
+    var type=drag.type,moved=drag.moved;
+    drag=null;
+    el.style.cursor='grab';
+    if(type==='me'){
+      if(moved<=CLICK_DIST){ revealNextSin(); return; }
+      if(!hasSin() && dist(center(god),center(me))<SNAP_DIST){
+        meWithGod=true;
+        /* [수정] 죄가 '어떻게' 없어졌는지에 따라 마무리 문장 구분:
+           6과에서 피로 씻긴 뒤에는 그 이유를 문장에 남깁니다. */
+        setStatus(cleansedByJesus
+          ? '예수님이 죄를 없애주셔서, 하나님과 함께 하늘나라에 있을 수 있어요'
+          : '죄가 없으면 하나님과 함께 하늘나라에 있을 수 있어요');
+      }
+    }
+    if(type==='blob'){
+      if(moved<=CLICK_DIST){ blobShake(); return; }
+      blobReturn();
+    }
+  }
+
+  godEl.addEventListener('pointerdown',function(e){ startDrag(e,'god',god,godEl); });
+  godEl.addEventListener('pointermove',moveDrag);
+  godEl.addEventListener('pointerup',function(e){ endDrag(e,godEl); });
+  meEl.addEventListener('pointerdown',function(e){ startDrag(e,'me',me,meEl); });
+  meEl.addEventListener('pointermove',moveDrag);
+  meEl.addEventListener('pointerup',function(e){ endDrag(e,meEl); });
+  blobEl.addEventListener('pointerdown',function(e){
+    if(blob.returning||cleansing) return;   /* [수정] 피 연출 중 드래그 방지 */
+    startDrag(e,'blob',blob,blobEl);
+  });
+  blobEl.addEventListener('pointermove',moveDrag);
+  blobEl.addEventListener('pointerup',function(e){ endDrag(e,blobEl); });
+
+  /* ---------- 죄 추가 (화면 안 입력창) ---------- */
+  function submitNewSin(){
+    var name=sinInputEl.value.trim();
+    if(!name){ sinInputEl.focus(); return; }
+    if(sins.length>=MAX_SINS){ setStatus('죄 칸이 가득 찼어요'); return; }
+    var s=makeSinChip({label:name,emoji:'💢',image:null,
+      situation:"'"+name+"' 행동을 했어요"});
+    revealSin(s);
+    sinInputEl.value='';
+    addFormEl.classList.remove('open');
+  }
+  document.getElementById('btn-add').addEventListener('click',function(){
+    addFormEl.classList.toggle('open');
+    if(addFormEl.classList.contains('open')) sinInputEl.focus();
+  });
+  document.getElementById('btn-add-confirm').addEventListener('click',submitNewSin);
+  sinInputEl.addEventListener('keydown',function(e){
+    if(e.key==='Enter') submitNewSin();
+    if(e.key==='Escape'){ addFormEl.classList.remove('open'); }
+  });
+
+  /* ---------- [수정] 예수님의 피 버튼 (6과 전용) ---------- */
+  bloodBtn.addEventListener('click',cleanseByBlood);
+
+  document.getElementById('btn-reset').addEventListener('click',function(){
+    while(sins.length>CONFIG.sins.length){
+      var s=sins.pop(); s.el.remove();
+    }
+    layout();
+  });
+
+  /* ---------- 시작 ---------- */
+  applySkins();
+  applyLesson();                 /* [수정] */
+  CONFIG.sins.forEach(makeSinChip);
+  window.addEventListener('resize',layout);
+  layout();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
