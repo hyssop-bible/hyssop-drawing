@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>민래님의 성경 배움터</title>
+<title>우슬초 1팀 디지털 활동</title>
 <style>
 /* =====================================================================
    메인 메뉴 (index.html)
@@ -53,7 +53,10 @@ a{color:inherit;text-decoration:none;}
 .card .big-em{
   flex:0 0 auto;width:74px;height:74px;border-radius:20px;
   display:flex;align-items:center;justify-content:center;
-  font-size:42px;background:var(--tint,#f6f2e8);
+  font-size:42px;background:var(--tint,#f6f2e8);overflow:hidden;
+}
+.card .big-em img{
+  width:100%;height:100%;object-fit:cover;display:block;
 }
 .card .tx{min-width:0;}
 .card .no{
@@ -86,11 +89,16 @@ a{color:inherit;text-decoration:none;}
 </style>
 </head>
 <body>
+<script src="assets/paths.js"></script>
+<script>
+/* ★ 6과 카드 아이콘 — assets/lesson6/ 폴더에 사진을 넣고 파일 이름만 적으세요 */
+var L6_ICON={ image:ASSET.lesson6("십자가.jpg"), emoji:"✝️" };
+</script>
 <div class="wrap">
 
   <div class="hero">
     <div class="em">📖</div>
-    <h1><span class="hl">민래님</span>의 성경 배움터</h1>
+    <h1><span class="hl">우슬초 1팀</span> 디지털 활동</h1>
     <p>오늘 배울 과를 눌러 보세요</p>
   </div>
 
@@ -119,7 +127,7 @@ a{color:inherit;text-decoration:none;}
       <div class="big-em">📖</div>
       <div class="tx">
         <span class="no">3과</span>
-        <div class="ti">하나님 말씀, 성경책</div>
+        <div class="ti">하나님의 사랑이 성경책에 있어요</div>
         <div class="sb">성경책을 찾고 책장을 넘겨요</div>
       </div>
       <div class="go">▶</div>
@@ -162,5 +170,16 @@ a{color:inherit;text-decoration:none;}
   </div>
 
 </div>
+<script>
+(function(){
+  var el=document.querySelector('.card.l6 .big-em');
+  if(!el||!L6_ICON.image) return;
+  var img=new Image();
+  img.onload=function(){ el.textContent=''; el.appendChild(img); };
+  img.onerror=function(){ el.textContent=L6_ICON.emoji||''; };
+  img.src=L6_ICON.image;
+  img.alt='';
+})();
+</script>
 </body>
 </html>
