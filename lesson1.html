@@ -31,9 +31,18 @@ header{
   display:flex;align-items:center;gap:10px;padding:10px 16px;
   background:var(--card);border-bottom:1px solid var(--line);
 }
-header .t{font-size:18px;font-weight:800;}
+header .t{min-width:0;font-size:18px;font-weight:800;}
 header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px;}
 #stars{margin-left:auto;font-size:20px;min-height:24px;letter-spacing:2px;}
+.home-btn{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-height:40px;padding:7px 12px;border:2px solid var(--line);border-radius:12px;
+  background:var(--card);color:var(--ink);font-size:15px;font-weight:800;text-decoration:none;
+  box-shadow:0 2px 0 rgba(0,0,0,.08);touch-action:manipulation;
+}
+.home-btn:active{transform:translateY(2px);}
+@media(max-width:540px){header .t small{display:none;}}
+@media(max-width:380px){.home-btn .home-label{display:none;}.home-btn{width:40px;padding:7px;}}
 
 .screen{flex:1;display:none;flex-direction:column;align-items:center;padding:14px;overflow:hidden;}
 .screen.on{display:flex;animation:fade .3s ease;}
@@ -116,6 +125,7 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 <body>
 <div id="app">
   <header>
+    <a class="home-btn" href="index.html" aria-label="홈으로 돌아가기">🏠 <span class="home-label">홈</span></a>
     <div class="t">1과 · 따라 그리기<small>하나님이 모두 만드셨어요</small></div>
     <div id="stars"></div>
   </header>

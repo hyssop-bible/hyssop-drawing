@@ -59,6 +59,15 @@ body{
   display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px;
 }
 h1{font-size:22px;font-weight:600;margin:0;margin-right:auto;}
+.home-btn{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-height:40px;padding:7px 12px;border:1px solid var(--border-strong);
+  border-radius:var(--radius);color:var(--text-primary);background:var(--surface-0);
+  font-size:15px;font-weight:600;text-decoration:none;
+}
+.home-btn:hover{background:var(--surface-1);}
+.home-btn:active{transform:scale(.98);}
+@media(max-width:380px){.home-btn .home-label{display:none;}.home-btn{width:40px;padding:7px;}}
 /* [수정] 차시 표시 배지 (교사 확인용) */
 .lesson-badge{
   font-size:13px;color:var(--text-secondary);
@@ -158,6 +167,7 @@ button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
 <body>
 <div class="wrap">
   <div class="topbar">
+    <a class="home-btn" href="index.html" aria-label="홈으로 돌아가기">🏠 <span class="home-label">홈</span></a>
     <h1>죄 활동 프로그램</h1>
     <span class="lesson-badge" id="lesson-badge"></span>
     <div id="add-form">
