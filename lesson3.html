@@ -4,10 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>3과 · 하나님 말씀, 성경책 — 성경책 찾기</title>
+<script src="assets/student-context.js"></script>
 <style>
 /* =====================================================================
    3과: 하나님 말씀, 성경책 — 성경책 찾기 & 말씀 넘겨 보기
-   대상: 이민래 학생 (구체물·시각 정보 기반 선택 활동 가능)
+   대상: 선택한 학생 (구체물·시각 정보 기반 선택 활동 가능)
    기기: 아이패드(애플펜슬/손가락) + 컴퓨터(마우스) 겸용 — Pointer Events
    흐름: [고르기 2권] → [고르기 3권] → [성경책 넘기기 → 사랑 말씀]
    책장: 세로 조각 사슬(휘어지는 종이) + 잡은 지점 추적 + 중력/관성
@@ -229,7 +230,7 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
   <section class="screen" id="end">
     <!-- <div class="heart-row">💛 💗 💛</div> -->
     <h2>성경책에 <span class="nm">하나님 사랑</span>이 있어요</h2>
-    <p>민래님, 성경책에서 하나님의 사랑을 발견하셨나요?!</p>
+    <p id="end-student-message"></p>
     <button class="go-btn" id="btn-again">한 번 더 하기</button>
   </section>
 
@@ -244,7 +245,9 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 <script>
 (function(){
 "use strict";
-var STUDENT="민래";
+var STUDENT=STUDENT_CONTEXT.name;
+document.getElementById("end-student-message").textContent=
+  STUDENT_CONTEXT.honorific+", 성경책에서 하나님의 사랑을 발견하셨나요?!";
 
 /* ================= 책 3권 사진 ================= */
 var BOOKS={
@@ -348,7 +351,7 @@ function pageHTML(p){
   }
   if(p.type==="final"){
     return '<div class="pcontent">'+
-           '<div class="vs">하나님은 <span class="nm">'+STUDENT+'</span>를<br>사랑하세요</div></div>';
+           '<div class="vs">하나님은 <span class="nm">'+STUDENT_CONTEXT.objectName+'</span><br>사랑하세요</div></div>';
   }
   return '<div class="pcontent"><div class="em">'+p.em+'</div>'+
          '<div class="vs">'+p.vs.replace(/\n/g,"<br>")+'</div>'+
@@ -561,7 +564,7 @@ function openBook(){
 finishBtn.addEventListener("click",function(){
   if(!finishBtn.classList.contains("on")||committing) return;
   finishBtn.classList.remove("on");
-  praise("","하나님은 "+STUDENT+"를 사랑하세요","성경책에 하나님 사랑이 있어요",2300,function(){
+  praise("","하나님은 "+STUDENT_CONTEXT.objectName+" 사랑하세요","성경책에 하나님 사랑이 있어요",2300,function(){
     stopLoop();
     show("end");
   });

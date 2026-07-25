@@ -9,7 +9,7 @@
    메인 메뉴 (index.html)
    — 각 과 프로그램(lesson1.html ~ lesson6.html)으로 들어가는 첫 화면
    — 1~4과와 동일한 디자인 시스템(종이 배경, 카드, 큰 버튼)
-   대상: 이민래 학생 / 기기: 아이패드·갤럭시탭·컴퓨터 공용
+   대상: 우슬초 학생 / 기기: 아이패드·갤럭시탭·컴퓨터 공용
    ===================================================================== */
 :root{
   --paper:#fbf7ef; --card:#fff; --ink:#2b2a26; --soft:#7a7770;
@@ -25,8 +25,38 @@ body{
   -webkit-touch-callout:none;
 }
 a{color:inherit;text-decoration:none;}
+[hidden]{display:none!important;}
 
 .wrap{max-width:820px;margin:0 auto;padding:26px 18px 40px;}
+
+/* ---------- 학생 선택 ---------- */
+.student-screen{
+  min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;
+  padding:28px 18px;
+}
+.student-panel{
+  width:100%;max-width:680px;padding:30px 24px;background:var(--card);
+  border:3px solid var(--line);border-radius:26px;box-shadow:var(--shadow);text-align:center;
+}
+.student-panel h1{
+  margin:0;font-size:clamp(30px,7vw,42px);font-weight:800;letter-spacing:-.5px;
+}
+.student-panel p{
+  margin:8px 0 24px;color:var(--soft);font-size:clamp(18px,4.5vw,22px);font-weight:700;
+}
+.student-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.student-btn{
+  min-height:62px;padding:12px 16px;border:3px solid var(--line);border-radius:18px;
+  background:var(--paper);color:var(--ink);font:inherit;font-size:21px;font-weight:800;
+  cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.07);touch-action:manipulation;
+}
+.student-btn:hover{border-color:var(--sun);background:#fffaf0;}
+.student-btn:active{transform:translateY(2px);}
+@media(max-width:430px){
+  .student-panel{padding:24px 16px;}
+  .student-list{grid-template-columns:1fr;gap:9px;}
+  .student-btn{min-height:54px;font-size:19px;}
+}
 
 /* ---------- 머리글 ---------- */
 .hero{text-align:center;margin-bottom:26px;}
@@ -37,6 +67,12 @@ a{color:inherit;text-decoration:none;}
 }
 .hero h1 .hl{color:var(--sun);}
 .hero p{color:var(--soft);font-size:17px;font-weight:700;margin:0;}
+.change-student{
+  margin-top:12px;padding:8px 14px;border:2px solid var(--line);border-radius:12px;
+  background:var(--card);color:var(--soft);font:inherit;font-size:14px;font-weight:800;
+  cursor:pointer;touch-action:manipulation;
+}
+.change-student:active{transform:translateY(2px);}
 
 /* ---------- 과 카드 ---------- */
 .grid{
@@ -90,17 +126,27 @@ a{color:inherit;text-decoration:none;}
 </head>
 <body>
 <script src="assets/paths.js"></script>
+<script src="assets/student-context.js"></script>
 <script>
 /* ★ 5·6과 카드 아이콘 — 각 과 assets 폴더의 사진을 사용합니다 */
 var L5_ICON={ image:ASSET.lesson5("memorization-card-sin-v2.png"), emoji:"💭" };
 var L6_ICON={ image:ASSET.lesson6("십자가.jpg"), emoji:"✝️" };
 </script>
-<div class="wrap">
+<section class="student-screen" id="student-screen" aria-labelledby="student-title">
+  <div class="student-panel">
+    <h1 id="student-title">안녕하세요</h1>
+    <p>누구인지 알려 주세요</p>
+    <div class="student-list" id="student-list"></div>
+  </div>
+</section>
+
+<div class="wrap" id="main-menu" hidden>
 
   <div class="hero">
     <div class="em">📖</div>
     <h1><span class="hl">우슬초 1팀</span> 디지털 활동</h1>
-    <p>오늘 배울 과를 눌러 보세요</p>
+    <p id="student-welcome">오늘 배울 과를 눌러 보세요</p>
+    <button class="change-student" id="change-student" type="button">학생 다시 선택</button>
   </div>
 
   <div class="grid">
@@ -184,6 +230,54 @@ var L6_ICON={ image:ASSET.lesson6("십자가.jpg"), emoji:"✝️" };
   }
   setCardIcon('.card.l5 .big-em',L5_ICON);
   setCardIcon('.card.l6 .big-em',L6_ICON);
+
+  var studentScreen=document.getElementById('student-screen');
+  var mainMenu=document.getElementById('main-menu');
+  var studentWelcome=document.getElementById('student-welcome');
+  var studentList=document.getElementById('student-list');
+  var changeStudent=document.getElementById('change-student');
+  var lessonLinks=document.querySelectorAll('.card[href^="lesson"]');
+  STUDENT_CONTEXT.students.forEach(function(name){
+    var button=document.createElement('button');
+    button.className='student-btn';
+    button.type='button';
+    button.setAttribute('data-student',name);
+    button.textContent=name;
+    studentList.appendChild(button);
+  });
+  var studentButtons=document.querySelectorAll('.student-btn');
+  function showStudentMenu(){
+    mainMenu.hidden=true;
+    studentScreen.hidden=false;
+    window.scrollTo(0,0);
+  }
+  function showLessons(name){
+    studentWelcome.textContent=STUDENT_CONTEXT.displayName(name)+' 학생, 오늘 배울 과를 눌러 보세요';
+    lessonLinks.forEach(function(link){
+      var base=link.getAttribute('data-base-href')||link.getAttribute('href').split('?')[0];
+      link.setAttribute('data-base-href',base);
+      link.setAttribute('href',base+'?student='+encodeURIComponent(name));
+    });
+    studentScreen.hidden=true;
+    mainMenu.hidden=false;
+    window.scrollTo(0,0);
+  }
+
+  studentButtons.forEach(function(button){
+    button.addEventListener('click',function(){
+      var name=button.getAttribute('data-student');
+      STUDENT_CONTEXT.select(name);
+      showLessons(name);
+    });
+  });
+  changeStudent.addEventListener('click',function(){
+    STUDENT_CONTEXT.clear();
+    showStudentMenu();
+  });
+
+  var currentStudent=STUDENT_CONTEXT.selectedName;
+  if(currentStudent){ showLessons(currentStudent); }
+  else{ showStudentMenu(); }
 })();
 </script>
 </body>

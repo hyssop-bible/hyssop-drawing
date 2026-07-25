@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>4과 · 하나님이 하늘나라를 준비했어요</title>
+<script src="assets/student-context.js"></script>
 <style>
 /* =====================================================================
    4과: 하나님이 하늘나라를 준비했어요
-   대상: 이민래 학생 (그림·색 선호, 조작 활동 집중, 자기 이름 쓰기 좋아함)
+   대상: 선택한 학생 (그림·색 선호, 조작 활동 집중, 자기 이름 쓰기 좋아함)
    기기: 아이패드(애플펜슬/손가락) + 컴퓨터(마우스) 겸용 — Pointer Events
    흐름: [상황극 1·2: 하늘나라로 보내기] → [어떤 사람이 있을까요?]
-         → [하늘나라 꾸미기(스티커)] → [따라쓰기: 하나님·하늘나라·민래]
+         → [하늘나라 꾸미기(스티커)] → [따라쓰기: 하나님·하늘나라·학생 이름]
          → [가고 싶어요?] → [갤러리 마무리]
    1과(따라 그리기 엔진)·3과(선택 활동)와 동일한 디자인 시스템
    ===================================================================== */
@@ -145,6 +146,10 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 #heaven .zlabel{position:absolute;top:10px;left:0;right:0;text-align:center;font-size:19px;font-weight:800;color:var(--sun);}
 .placed{position:absolute;width:min(96px,17vw);animation:drop .45s ease;}
 .placed svg{width:100%;height:auto;display:block;}
+.placed .student-photo{
+  width:100%;aspect-ratio:3/4;display:block;object-fit:cover;
+  border:3px solid #f0a92e;border-radius:16px;background:#fff;
+}
 @keyframes drop{0%{transform:scale(.3) translateY(-30px);opacity:0;}70%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
 #tray{
   display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
@@ -157,6 +162,10 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 }
 .stk:active{transform:scale(.9);}
 .stk svg{width:52px;height:auto;display:block;}
+.stk .student-photo{
+  width:52px;height:66px;display:block;object-fit:cover;
+  border:2px solid #f0a92e;border-radius:10px;background:#fff;
+}
 .stk .lb{font-size:13px;font-weight:800;color:var(--soft);}
 .stk.used{opacity:.35;pointer-events:none;}
 #deco-say{font-size:16px;font-weight:700;color:var(--soft);text-align:center;margin-top:8px;min-height:22px;}
@@ -299,14 +308,14 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 
   <!-- 5) 가고 싶어요? -->
   <section class="screen" id="ask">
-    <div class="big"><span class="lv">민래</span>도 하늘나라에<br>가고 싶어요?</div>
-    <p>하나님이 민래를 기다리고 계세요</p>
+    <div class="big" id="ask-title"></div>
+    <p id="ask-message"></p>
     <button class="love-btn" id="btn-yes">💛 네! 가고 싶어요</button>
   </section>
 
   <!-- 마무리 -->
   <section class="screen" id="end">
-    <h2>🎉 <span class="lv">민래</span>가 하늘나라를 배웠어요</h2>
+    <h2 id="end-title"></h2>
     <div class="heart-row">💛 ☁️ 💛</div>
     <p>하늘나라는 아픔도 슬픔도 없이, 하나님과 행복한 곳이에요</p>
     <div class="g-grid" id="g-grid"></div>
@@ -324,7 +333,13 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
 <script>
 (function(){
 "use strict";
-var STUDENT="민래";
+var STUDENT=STUDENT_CONTEXT.name;
+document.getElementById("ask-title").innerHTML=
+  '<span class="lv">'+STUDENT+'</span>도 하늘나라에<br>가고 싶어요?';
+document.getElementById("ask-message").textContent=
+  "하나님이 "+STUDENT_CONTEXT.objectName+" 기다리고 계세요";
+document.getElementById("end-title").textContent=
+  "🎉 "+STUDENT_CONTEXT.subjectName+" 하늘나라를 배웠어요";
 
 /* ================= 사람 캐릭터 SVG 생성 ================= */
 /* mood: sick(아픔·목발) | sad(눈물) | happy(만세·웃음) | calm(미소)  tag: 이름표 */
@@ -382,6 +397,12 @@ function personInner(mood,shirt){
   var full=personSVG(mood,null,shirt);
   return full.replace(/^<svg[^>]*>/,"").replace(/<\/svg>$/,"");
 }
+function selectedStudentVisual(){
+  if(STUDENT_CONTEXT.photo){
+    return '<img class="student-photo" src="'+STUDENT_CONTEXT.photo+'" alt="'+STUDENT+'">';
+  }
+  return personSVG("happy",STUDENT,"#f0a92e");
+}
 
 /* ================= 상황극 데이터 ================= */
 var DRAMA=[
@@ -400,7 +421,7 @@ var STICKERS=[
  {key:"happy2", lb:"웃는 사람",   svg:personSVG("happy",null,"#b79fd6"), cap:"슬펐던 사람이 하늘나라에서 행복해요"},
  {key:"family", lb:"가족",        svg:familySVG(),                        cap:"가족도 하늘나라에서 함께 기뻐요"},
  {key:"tch",    lb:"선생님",      svg:personSVG("calm",null,"#e8b53e"),   cap:"선생님도 하늘나라에 가고 싶어요"},
- {key:"me",     lb:STUDENT,       svg:personSVG("happy",STUDENT,"#f0a92e"),cap:"하나님이 "+STUDENT+"를 기다리고 계세요"}
+ {key:"me",     lb:STUDENT,       svg:selectedStudentVisual(),cap:"하나님이 "+STUDENT_CONTEXT.objectName+" 기다리고 계세요"}
 ];
 var SLOTS=[[8,38],[34,55],[58,34],[76,58],[40,20]]; // [left%, top%]
 var placedCount=0;
@@ -409,7 +430,7 @@ var placedCount=0;
 var WORDS=[
  {w:"하나님",   sub:"하늘나라에는 하나님이 계세요"},
  {w:"하늘나라", sub:"하나님이 준비하신 곳이에요"},
- {w:STUDENT,   sub:"하나님이 "+STUDENT+"를 기다리세요"}
+ {w:STUDENT,   sub:"하나님이 "+STUDENT_CONTEXT.objectName+" 기다리세요"}
 ];
 var wIdx=0, works=[];
 
@@ -704,7 +725,7 @@ window.addEventListener("resize",function(){
 /* ================= 5) 가고 싶어요? → 마무리 ================= */
 $("btn-yes").addEventListener("click",function(){
   starCount++; renderStars();
-  praise("","하나님이 "+STUDENT+"를 기다리고 계세요","하늘나라에서 하나님과 함께 행복해요",2300,function(){
+  praise("","하나님이 "+STUDENT_CONTEXT.objectName+" 기다리고 계세요","하늘나라에서 하나님과 함께 행복해요",2300,function(){
     openEnd();
   });
 });

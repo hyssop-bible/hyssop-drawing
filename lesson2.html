@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>2과 · 하나님은 사람을 사랑하세요 — 하트 붙이기</title>
 <script src="assets/paths.js"></script>
+<script src="assets/student-context.js"></script>
 <script>
 /* =====================================================================
    ★★★ 이미지 넣는 곳 (여기만 만지면 됩니다) ★★★
@@ -15,7 +16,7 @@
 
    - name  : 화면 문장에 그대로 들어갑니다 → "하나님이 ○○을 사랑하세요"
    - emoji : 사진이 없을 때 대신 보여줄 그림(대체 자원)
-   - me    : true면 민래님 본인 카드(노란 테두리). 마지막에 두면 절정.
+   - me    : true면 선택한 학생 본인 카드(노란 테두리). 마지막에 두면 절정.
    - 카드 순서 = 나오는 순서. 줄을 복사해 사람을 늘리거나 지워도 됩니다.
    ===================================================================== */
 var PEOPLE=[
@@ -23,14 +24,14 @@ var PEOPLE=[
   { name:"아이",      emoji:"🧒", image:ASSET.lesson2("아이.png") },
   { name:"어른",      emoji:"🧑", image:ASSET.lesson2("어른.png") },
   { name:"할머니",    emoji:"👵", image:ASSET.lesson2("할머니.png") },
-  { name:"민래님",    emoji:"🙂", image:ASSET.lesson2("민래.jpg"), me:true }
+  { name:STUDENT_CONTEXT.honorific, emoji:"🙂", image:STUDENT_CONTEXT.photo, me:true }
 ];
 </script>
 <style>
 /* =====================================================================
    2과: 하나님은 사람을 사랑하세요 — 하트 끌어 붙이기 (v3)
    v3 변경: 이미지 드롭인 구조(없으면 이모지 자동 대체) + 이미지 대형화
-   대상: 이민래 학생 / 기기: 아이패드(손가락·펜슬) + 컴퓨터(마우스)
+   대상: 선택한 학생 / 기기: 아이패드(손가락·펜슬) + 컴퓨터(마우스)
    ===================================================================== */
 :root{
   --paper:#fbf7ef; --card:#fff; --ink:#2b2a26; --soft:#7a7770;
@@ -186,7 +187,7 @@ header .t small{color:var(--soft);font-weight:600;margin-left:6px;font-size:14px
   <!-- 완료 -->
   <section class="screen" id="doneScr">
     <div class="party">🎉</div>
-    <h2>민래님이 다 붙였어요!</h2>
+    <h2 id="done-title"></h2>
     <p>하나님은 <b>모두</b> 사랑하세요</p>
     <div class="verse">
       <div class="v">하나님은 사랑이시라</div>
@@ -206,10 +207,11 @@ var startScr=$("start"), playScr=$("play"), doneScr=$("doneScr");
 var slot=$("card-slot"), field=$("field"), tray=$("tray"), heart=$("heart");
 var sayLine=$("say-line"), dotsEl=$("dots"), starsEl=$("stars");
 var idx=0, stars=0, curCard=null, advancing=false;
+document.getElementById("done-title").textContent=STUDENT_CONTEXT.subjectName+" 다 붙였어요!";
 
 function renderStars(){ starsEl.textContent="⭐".repeat(Math.min(stars,8)); }
 function show(scr){ [startScr,playScr,doneScr].forEach(function(s){s.classList.remove("on");}); scr.classList.add("on"); }
-function speak(name){ sayLine.innerHTML='하나님이 <span class="nm">'+name+'</span>을 사랑하세요'; }
+function speak(name){ sayLine.innerHTML='하나님이 <span class="nm">'+STUDENT_CONTEXT.withObjectParticle(name)+'</span> 사랑하세요'; }
 
 /* ---------------- 진행 점 ---------------- */
 function buildDots(){

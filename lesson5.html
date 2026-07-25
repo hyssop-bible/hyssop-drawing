@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>죄 활동 프로그램</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<script src="assets/student-context.js"></script>
 <style>
 :root{
   --surface-0:#faf9f5;
@@ -181,7 +182,7 @@ button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
     <button id="btn-blood" style="display:none;"></button>
     <button id="btn-reset"><i class="ti ti-refresh" aria-hidden="true"></i>처음부터</button>
   </div>
-  <div id="status">'나'를 클릭해 보세요. 나에게 무엇이 있을까요?</div>
+  <div id="status"></div>
 
   <div id="arena">
     <div id="heaven">
@@ -222,7 +223,7 @@ button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
      ※ 하나님은 교안 원칙(텍스트로만 표현)에 따라 CONFIG에 넣지 않습니다.
   ================================================================ */
   var CONFIG = {
-    me:     { label: '나',      emoji: '🙂', image: null },
+    me:     { label: STUDENT_CONTEXT.name, emoji: '🙂', image: STUDENT_CONTEXT.photo },
     heaven: { label: '하늘나라', emoji: '☁️', image: null },
     sins: [
       { label: '거짓말', emoji: '🤥', image: null,
@@ -245,6 +246,7 @@ button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
   var blobInnerEl=document.getElementById('blob-inner');
   var sinlistEl=document.getElementById('sinlist');
   var statusEl=document.getElementById('status');
+  statusEl.textContent=STUDENT_CONTEXT.objectName+" 클릭해 보세요. 내 안에 무엇이 있을까요?";
   var addFormEl=document.getElementById('add-form');
   var sinInputEl=document.getElementById('sin-input');
   var bloodBtn=document.getElementById('btn-blood');       /* [수정] */
@@ -493,7 +495,7 @@ button .ti{font-size:17px;vertical-align:-2px;margin-right:4px;}
     updateBlob();
     meWithGod=false;
     popping=false;
-    setStatus("'나'를 클릭해 보세요. 내 안에 무엇이 있을까요?");
+    setStatus(STUDENT_CONTEXT.objectName+" 클릭해 보세요. 내 안에 무엇이 있을까요?");
   }
 
   function render(){
