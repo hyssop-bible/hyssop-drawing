@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>10월 3일 · 하나님이 만드신 자연</title>
+<script src="assets/student-context.js"></script>
+<link rel="stylesheet" href="assets/oct03/activity.css">
+<script src="assets/oct03/activity.js" defer></script>
+</head>
+<body>
+<header><a class="home" href="index.html">⌂ 홈</a><b>10월 3일 · 자연 찾기</b><span id="count">1 / 7</span></header>
+<main>
+<div class="pages" id="pages" aria-label="활동 페이지"></div>
+<ol class="steps" id="steps" aria-label="활동 순서" hidden><li>1 찾기</li><li>2 담기</li><li>3 보기</li></ol>
+<h1 id="title" tabindex="-1">하나님이 만드신 ‘자연’은 무엇일까요?</h1>
+<section class="pair" id="choice" aria-label="두 사진 중 자연 찾기">
+<button class="photo" id="made" aria-pressed="false"><span class="frame"><img id="made-img" alt=""></span><span class="caption" id="made-name"></span></button>
+<button class="photo natural" id="nature" aria-pressed="false"><span class="frame"><img id="nature-img" alt=""></span><span class="caption" id="nature-name"></span></button>
+</section>
+<section id="collect" aria-label="열매 담기" hidden>
+<div class="input-modes" aria-label="담는 방법"><button class="quiet" id="mode-drag" aria-pressed="true">끌어서 담기</button><button class="quiet" id="mode-tap" aria-pressed="false">눌러서 담기</button></div>
+<div class="fruit-tray" id="fruit-tray"></div>
+<div class="basket-area" id="basket-area"><div class="basket-fruits" id="basket-fruits" aria-label="바구니에 담은 열매"></div><div class="basket-body" aria-hidden="true"></div><p id="basket-label">바구니</p></div>
+</section>
+<section id="review" class="review" aria-label="담은 열매 다시 보기" hidden>
+<button class="photo" id="review-photo"><span class="frame"><img id="review-img" alt=""></span><span class="caption" id="review-name"></span></button>
+<div class="review-note"><div class="mini-fruits" id="review-fruits" aria-hidden="true"></div><p id="review-message"></p><button class="quiet" id="replay">↻ 다시 담기</button></div>
+</section>
+<section id="gallery" class="gallery" aria-label="오늘 만난 자연" hidden></section>
+<p class="feedback" id="feedback" role="status" aria-live="polite">자연이라고 생각하는 사진을 눌러 보세요.</p>
+<div class="action-row"><button class="primary" id="activity-action" hidden></button></div>
+<nav aria-label="페이지 이동"><button class="nav" id="prev">← 이전</button><button class="nav next" id="next">다음 →</button></nav>
+</main>
+</body>
+</html>
