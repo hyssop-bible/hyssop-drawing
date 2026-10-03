@@ -6,8 +6,8 @@ const pairs=[
  {made:'버스정류장',madeFile:'shelter.jpg',madeText:'버스정류장은 사람이 만들었어요.',nature:'사과',natureFile:'apple-1200.jpg',natureText:'나무에서 열린 사과는 하나님이 만드신 자연이에요.'},
  {made:'다리',madeFile:'bridge.jpg',madeText:'다리는 사람이 만들었어요.',nature:'물고기',natureFile:'fish.jpg',natureText:'물고기도 하나님이 만드신 자연이에요.'},
  {made:'등대',madeFile:'lighthouse.jpg',madeText:'등대는 사람이 지었어요.',nature:'새',natureFile:'bird.jpg',natureText:'새도 하나님이 만드신 자연이에요.'},
- {made:'건물',madeFile:'building.jpg',madeText:'건물은 사람이 지었어요.',nature:'도토리',natureFile:'acorn.jpg',natureText:'도토리는 참나무에서 자라는 열매예요. 하나님이 만드신 자연이에요.'},
- {made:'놀이터',madeFile:'playground.jpg',madeText:'놀이터의 놀이 기구는 사람이 만들었어요.',nature:'밤',natureFile:'chestnut.jpg',natureText:'밤은 밤나무에서 자라는 열매예요. 하나님이 만드신 자연이에요.'}
+ {made:'건물',madeFile:'building.jpg',madeText:'건물은 사람이 지었어요.',nature:'도토리',natureFile:'acorn-realistic.png',natureText:'도토리는 참나무에서 자라는 열매예요. 하나님이 만드신 자연이에요.'},
+ {made:'놀이터',madeFile:'playground.jpg',madeText:'놀이터의 놀이 기구는 사람이 만들었어요.',nature:'밤',natureFile:'chestnut-realistic.png',natureText:'밤은 밤나무에서 자라는 열매예요. 하나님이 만드신 자연이에요.'}
 ];
 const $=id=>document.getElementById(id);
 const states=pairs.map(()=>({pick:null,stage:'find',fruit:[false,false],met:false}));
@@ -16,7 +16,7 @@ let page=Number.isInteger(requestedPage)&&requestedPage>=1&&requestedPage<=pairs
 const animations=new Set();
 let inputMode='drag',drag=null;
 const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
-const fruitArt=kind=>kind==='acorn' ? '<img src="assets/oct03/acorn-realistic.png" alt="" draggable="false" aria-hidden="true">'  : `<svg viewBox="0 0 120 140" aria-hidden="true"><path d="M60 15 C51 30 18 42 13 82 C7 114 27 130 60 130 C95 130 114 114 108 82 C102 46 69 32 60 15Z" fill="#794127" stroke="#512d22" stroke-width="3"/><path d="M17 106 Q60 84 105 106 C99 124 81 130 60 130 C39 130 22 124 17 106Z" fill="#d3af76"/><path d="M34 49 Q19 68 25 87" fill="none" stroke="#c08a56" stroke-width="7" stroke-linecap="round"/><path d="M32 112 L35 121 M44 108 L46 124 M57 106 L57 126 M70 108 L69 124 M83 111 L80 122" stroke="#a18459" stroke-width="2"/></svg>`;
+const fruitArt=kind=>`<img src="assets/oct03/${kind==='acorn'?'acorn':'chestnut'}-realistic.png" width="1254" height="1254" alt="" draggable="false" aria-hidden="true">`;
 function kind(){return page===5?'acorn':'chestnut'}
 function hasActivity(){return page>=5}
 function instruction(){
